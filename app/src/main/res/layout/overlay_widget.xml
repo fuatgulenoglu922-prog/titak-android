@@ -27,15 +27,13 @@
             android:textStyle="bold"
             android:textSize="13sp" />
 
-        <ImageButton
+        <Button
             android:id="@+id/btn_ov_minimize"
             android:layout_width="30dp"
             android:layout_height="26dp"
             android:text="─"
             android:textColor="@color/text_dim"
             android:background="@color/transparent"
-            android:src="@drawable/ic_minimize"
-            android:scaleType="centerInside"
             android:padding="4dp" />
 
         <ImageButton
