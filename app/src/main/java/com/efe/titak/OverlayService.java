@@ -15,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import java.util.List;
 
 /**
  * OverlayService — Ekran üstü kayan widget servisi
@@ -35,7 +37,8 @@ public class OverlayService extends Service implements BotEngine.BotListener {
     private WindowManager.LayoutParams params;
 
     private TextView tvStatus, tvSession, tvTotal, tvLog;
-    private ImageButton btnPower, btnMinimize;
+    private ImageButton btnPower;
+    private Button btnMinimize;
     private LinearLayout bodyLayout;
 
     private boolean minimized = false;
