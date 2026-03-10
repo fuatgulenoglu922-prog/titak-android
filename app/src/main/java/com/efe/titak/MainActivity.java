@@ -42,13 +42,26 @@ public class MainActivity extends AppCompatActivity {
         
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
-        tvVersion.setText("v2.0 — AI Ekran Botu");
+        tvVersion.setText("v3.0 — OpenCV Kesin Çözüm");
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
 
         // Erişilebilirlik butonu
         cardAccessibility.setOnClickListener(v -> openAccessibilitySettings());
+
+        // Resim Seçiciler
+        ImageView imgChest = findViewById(R.id.img_tpl_chest);
+        ImageView imgOpen = findViewById(R.id.img_tpl_open);
+        ImageView imgEmpty = findViewById(R.id.img_tpl_empty);
+
+        loadSavedImage(imgChest, "tpl_chest");
+        loadSavedImage(imgOpen, "tpl_open");
+        loadSavedImage(imgEmpty, "tpl_empty");
+
+        imgChest.setOnClickListener(v -> pickImage("tpl_chest"));
+        imgOpen.setOnClickListener(v -> pickImage("tpl_open"));
+        imgEmpty.setOnClickListener(v -> pickImage("tpl_empty"));
 
         // Kayan widget başlat
         btnStartOverlay.setOnClickListener(v -> {
@@ -65,12 +78,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private String currentImageKey;
+
+    private void pickImage(String key) {
+        currentImageKey = key;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(intent, 2002);
+    }
+
+    private void saveImageUri(String key, Uri uri) {
+        getSharedPreferences("bot_prefs", MODE_PRIVATE)
+            .edit()
+            .putString(key, uri.toString())
+            .apply();
+    }
+
+    private void loadSavedImage(ImageView imageView, String key) {
+        String uriStr = getSharedPreferences("bot_prefs", MODE_PRIVATE).getString(key, null);
+        if (uriStr != null) {
+            imageView.setImageURI(Uri.parse(uriStr));
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_MEDIA_PROJECTION) {
             if (resultCode == RESULT_OK && data != null) {
-                // Permission granted, start services
                 startOverlayService();
                 
                 Intent captureIntent = new Intent(this, ScreenCaptureService.class);
@@ -82,9 +118,18 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     startService(captureIntent);
                 }
-                
-                // Ana ekranı gizle (arka plana geç)
                 moveTaskToBack(true);
+            }
+        } else if (requestCode == 2002 && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                saveImageUri(currentImageKey, uri);
+                ImageView iv = null;
+                if ("tpl_chest".equals(currentImageKey)) iv = findViewById(R.id.img_tpl_chest);
+                if ("tpl_open".equals(currentImageKey)) iv = findViewById(R.id.img_tpl_open);
+                if ("tpl_empty".equals(currentImageKey)) iv = findViewById(R.id.img_tpl_empty);
+                if (iv != null) iv.setImageURI(uri);
             }
         }
     }
