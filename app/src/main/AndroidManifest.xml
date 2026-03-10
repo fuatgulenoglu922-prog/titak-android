@@ -40,6 +40,16 @@
                 android:value="Kayan bot kontrolcüsü" />
         </service>
 
+        <service
+            android:name=".ScreenCaptureService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Ekran okuma servisi" />
+        </service>
+
         <!-- TikTok Erişilebilirlik Servisi (Otomatik Tıklama) -->
         <service
             android:name=".BotAccessibilityService"
