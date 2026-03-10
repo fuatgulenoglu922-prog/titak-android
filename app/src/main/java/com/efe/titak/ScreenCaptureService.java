@@ -55,7 +55,7 @@ public class ScreenCaptureService extends Service {
     private Handler handler;
     private boolean isScanning = false;
 
-    private static final long SCAN_INTERVAL_MS = 1000; // 1 second for OpenCV
+    private static final long SCAN_INTERVAL_MS = 300; // 0.3 second for fast reaction
 
     private Mat templateChest;
     private Mat templateOpen;
@@ -233,16 +233,19 @@ public class ScreenCaptureService extends Service {
         isScanning = false;
     }
 
+    private long lastChestTapTime = 0;
+
     private boolean checkTemplates(Mat screen) {
         boolean found = false;
         double threshold = 0.85; // %85 benzerlik
 
-        // 1. Önce "Boş / Bitti" şablonuna bak
+        // 1. Önce "Boş / Bitti / Tamam" şablonuna bak
         if (templateEmpty != null) {
             Point p = match(screen, templateEmpty, threshold);
             if (p != null) {
-                BotEngine.get().log("❌ Sandık Bitti/Boş Şablonu Eşleşti");
-                BotEngine.get().forceSwipe();
+                BotEngine.get().updateStatus("❌ Tamam/Boş Butonu Eşleşti, Kapatılıyor");
+                BotEngine.get().requestTap((float) p.x + (templateEmpty.cols() / 2f), (float) p.y + (templateEmpty.rows() / 2f));
+                BotEngine.get().forceSwipe(); // Tıkladıktan sonra yayını geç
                 return true;
             }
         }
@@ -251,6 +254,8 @@ public class ScreenCaptureService extends Service {
         Point openPoint = match(screen, templateOpen, threshold);
         if (openPoint != null) {
             BotEngine.get().updateStatus("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
+            // Hızlıca 2 kez tıklaması için erişilebilirliğe ardarda komut gönderilebilir
+            // Fakat 300ms döngü hızı zaten saniyede 3 kez tıklayacaktır.
             BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
             BotEngine.get().registerChestWatching(); 
             return true;
@@ -259,9 +264,17 @@ public class ScreenCaptureService extends Service {
         // 3. Sandık İkonuna bak (Eğer varsa tıkla ve bekle)
         Point chestPoint = match(screen, templateChest, threshold);
         if (chestPoint != null) {
-            BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Tıklanıyor!");
-            BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
             BotEngine.get().registerChestWatching(); 
+            
+            // Sandığın üstüne 5 saniyede 1 kereden fazla basma (sürekli açıp kapatmaması için)
+            long now = System.currentTimeMillis();
+            if (now - lastChestTapTime > 5000) {
+                BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Açılıyor...");
+                BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
+                lastChestTapTime = now;
+            } else {
+                BotEngine.get().updateStatus("🎁 Sandık Sayacı Bekleniyor...");
+            }
             return true;
         }
 
