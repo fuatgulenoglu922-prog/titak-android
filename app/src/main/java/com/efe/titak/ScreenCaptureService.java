@@ -250,18 +250,17 @@ public class ScreenCaptureService extends Service {
         // 2. Aç butonuna bak (Eğer varsa tıkla)
         Point openPoint = match(screen, templateOpen, threshold);
         if (openPoint != null) {
-            BotEngine.get().log("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
+            BotEngine.get().updateStatus("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
             BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
-            
-            // Tıkladıktan sonra başarılı sayılır
-            BotEngine.get().onCoinCollected("opencv-match");
+            BotEngine.get().registerChestWatching(); 
             return true;
         }
 
-        // 3. Sandık İkonuna bak (Eğer varsa bekle)
+        // 3. Sandık İkonuna bak (Eğer varsa tıkla ve bekle)
         Point chestPoint = match(screen, templateChest, threshold);
         if (chestPoint != null) {
-            BotEngine.get().updateStatus("🎁 Sandık Bekleniyor (Açılmadı)");
+            BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Tıklanıyor!");
+            BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
             BotEngine.get().registerChestWatching(); 
             return true;
         }
