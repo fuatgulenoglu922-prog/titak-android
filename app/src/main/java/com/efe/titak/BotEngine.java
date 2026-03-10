@@ -101,6 +101,7 @@ public class BotEngine {
     private long lastActionTime = 0;
     private int noChestCount = 0;
     private boolean isWatchingChest = false;
+    private boolean hasClickedChest = false;
 
     public void requestTap(float x, float y) {
         if (accessibilityService != null) {
@@ -117,7 +118,16 @@ public class BotEngine {
             accessibilityService.autoSwipe();
             noChestCount = 0;
             isWatchingChest = false;
+            hasClickedChest = false;
         }
+    }
+    
+    public void setChestClicked(boolean clicked) {
+        this.hasClickedChest = clicked;
+    }
+
+    public boolean hasClickedChest() {
+        return hasClickedChest;
     }
     
     public void registerChestWatching() {
