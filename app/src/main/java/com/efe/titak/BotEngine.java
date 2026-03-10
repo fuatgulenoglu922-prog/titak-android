@@ -131,19 +131,21 @@ public class BotEngine {
             // updateStatus("🎯 Hedef bulundu");
         } else {
             if (isWatchingChest) {
-                // Eğer daha önce sandık görüyorduysak ve şimdi hiçbir şey yoksa (veya açıldıysa), 
-                // biraz bekleyip kaydırabiliriz. Ama genelde resimler tam örtüşmeyebilir. 
-                // Buraya ufak bir tolerans koyalım.
+                // Eğer sandık varsa sabırla bekle. Saatlerce bile sürebilir.
+                // Sandık popup'ı açıldığında arka plan kararır ve şablon eşleşmeyebilir,
+                // bu yüzden hemen kaydırmamak çok önemli.
                 noChestCount++;
-                updateStatus("👀 Sandık Kayboldu? " + noChestCount + "/5");
-                if (noChestCount >= 5) {
-                    log("⏭️ Sandık Yok Oldu. Kaydırılıyor...");
+                updateStatus("⏳ Sandık Açılması Bekleniyor... " + (noChestCount * 300 / 1000) + "sn");
+                // 300ms * 400 = 120 saniye boyunca bekle (2 dakika)
+                if (noChestCount >= 400) {
+                    log("⏭️ 2 Dakika Geçti, Sandık Açılmadı. Kaydırılıyor...");
                     forceSwipe();
                 }
             } else {
                 noChestCount++;
-                updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/15");
-                if (noChestCount >= 15) { // 15 seconds if 1s scan interval
+                updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/50");
+                // 300ms * 50 = 15 saniye hedef yoksa kaydır
+                if (noChestCount >= 50) { 
                     log("⏭️ Sandık Yok. Kaydırılıyor...");
                     forceSwipe();
                 }
