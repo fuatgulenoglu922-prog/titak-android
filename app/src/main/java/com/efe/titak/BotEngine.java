@@ -96,7 +96,42 @@ public class BotEngine {
         notifyState();
     }
 
-    // ─── Private ──────────────────────────────────────────────
+    // ─── AI Haberleşme ─────────────────────────────────────────
+
+    private long lastActionTime = 0;
+    private int noChestCount = 0;
+
+    public void requestTap(float x, float y) {
+        if (accessibilityService != null) {
+            accessibilityService.performTapGesture(x, y);
+            noChestCount = 0; // reset
+        } else {
+            log("❌ Erişilebilirlik kapalı, tıklanamıyor!");
+        }
+    }
+
+    public void forceSwipe() {
+        if (accessibilityService != null) {
+            accessibilityService.autoSwipe();
+            noChestCount = 0;
+        }
+    }
+
+    public void recordScan(boolean foundTarget) {
+        if (foundTarget) {
+            noChestCount = 0;
+            updateStatus("🎯 Hedef bulundut - Tıklanıyor");
+        } else {
+            noChestCount++;
+            updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/10");
+            if (noChestCount >= 10) { // Approx 15 seconds if 1.5s scan interval
+                log("⏭️ Sandık Yok. Kaydırılıyor...");
+                forceSwipe();
+                noChestCount = 0;
+            }
+        }
+    }
+
     private void notifyState() {
         if (listener != null) {
             listener.onStateChanged(active, sessionCount, totalCount, status);

@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.media.projection.MediaProjectionManager;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -20,6 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView iconOverlay, iconAccessibility;
     private TextView tvOverlayStatus, tvAccessibilityStatus;
     private TextView tvVersion;
+    
+    private static final int REQUEST_MEDIA_PROJECTION = 1001;
+    private MediaProjectionManager projectionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +39,10 @@ public class MainActivity extends AppCompatActivity {
         tvOverlayStatus    = findViewById(R.id.tv_overlay_status);
         tvAccessibilityStatus = findViewById(R.id.tv_accessibility_status);
         tvVersion          = findViewById(R.id.tv_version);
+        
+        projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
-        tvVersion.setText("v1.0 — Ekran Üstü Bot");
+        tvVersion.setText("v2.0 — AI Ekran Botu");
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
@@ -53,8 +60,33 @@ public class MainActivity extends AppCompatActivity {
                 showAccessibilityDialog();
                 return;
             }
-            startOverlayService();
+            // Request Screen Recording Permission
+            startActivityForResult(projectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_MEDIA_PROJECTION) {
+            if (resultCode == RESULT_OK && data != null) {
+                // Permission granted, start services
+                startOverlayService();
+                
+                Intent captureIntent = new Intent(this, ScreenCaptureService.class);
+                captureIntent.setAction(ScreenCaptureService.ACTION_START);
+                captureIntent.putExtra(ScreenCaptureService.EXTRA_RESULT_CODE, resultCode);
+                captureIntent.putExtra(ScreenCaptureService.EXTRA_RESULT_DATA, data);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(captureIntent);
+                } else {
+                    startService(captureIntent);
+                }
+                
+                // Ana ekranı gizle (arka plana geç)
+                moveTaskToBack(true);
+            }
+        }
     }
 
     @Override
@@ -138,7 +170,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(intent);
         }
-        // Ana ekranı gizle (arka plana geç)
-        moveTaskToBack(true);
     }
 }
