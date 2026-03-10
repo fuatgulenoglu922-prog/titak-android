@@ -4,172 +4,202 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
 import android.graphics.Path;
 import android.os.Build;
-import android.os.Bundle;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.os.Handler;
+import android.os.Looper;
 
-import java.util.List;
-
-/**
- * BotAccessibilityService
- *
- * TikTok uygulamasını izler, ekranda sandık / treasure chest
- * elementleri belirdiğinde otomatik olarak tıklar.
- *
- * İki tıklama yöntemi:
- *   1. Accessibility tree node tıklama (performAction)
- *   2. Gesture-based koordinat tıklama (dispatchGesture) - fallback
- */
 public class BotAccessibilityService extends AccessibilityService {
 
-    // TikTok paket adları (farklı ülkeler için farklı paketler)
     private static final String[] TIKTOK_PACKAGES = {
-        "com.zhiliaoapp.musically",   // TikTok (Global)
-        "com.ss.android.ugc.trill",   // TikTok (bazı bölgeler)
-        "com.ss.android.ugc.aweme",   // Douyin (Çin)
-        "com.zhiliaoapp.musically.go" // TikTok Lite
+        "com.zhiliaoapp.musically",
+        "com.ss.android.ugc.trill",
+        "com.ss.android.ugc.aweme",
+        "com.zhiliaoapp.musically.go"
     };
 
-    // Sandık/ödül içeriği için arama kalıpları (küçük harf)
     private static final String[] TREASURE_KEYWORDS = {
-        "treasure", "chest", "lucky", "gift box", "lucky box",
-        "rose", "open", "collect", "claim", "reward",
-        "haziney", "sandık", "ödül", "topla", "aç",
-        "free", "bonus", "prize"
+        "treasure", "chest", "lucky", "hazine", "sandık"
     };
 
-    // Claim butonu kelimeleri
     private static final String[] CLAIM_KEYWORDS = {
         "open", "collect", "claim", "receive", "grab",
-        "aç", "topla", "al", "ödülü al", "hemen al",
-        "tap to open", "tap to collect"
+        "aç", "topla", "al", "ödülü al", "hemen al"
     };
 
-    private long lastClickTime = 0;
-    private static final long CLICK_COOLDOWN_MS = 3000; // 3 saniyede bir en fazla tıkla
+    private static final String[] SUCCESS_KEYWORDS = {
+        "kazandın", "jeton", "coin", "tebrikler", "got", "kutladın"
+    };
+
+    private static final String[] EMPTY_KEYWORDS = {
+        "boş", "empty", "bitti", "better luck", "try again", "sonraki"
+    };
+
+    private long lastActionTime = 0;
+    private static final long COOLDOWN_MS = 2000;
+    
+    // States
+    private static final int STATE_SCANNING = 0;
+    private static final int STATE_CLICKED_CHEST = 1;
+    private static final int STATE_CLICKED_OPEN = 2;
+    private int state = STATE_SCANNING;
+
+    private Handler handler;
+    private Runnable swipeRunnable;
 
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
         BotEngine.accessibilityService = this;
         BotEngine.get().log("✅ Erişilebilirlik servisi bağlandı");
+        
+        handler = new Handler(Looper.getMainLooper());
+        swipeRunnable = () -> {
+            if (BotEngine.get().isActive() && state == STATE_SCANNING) {
+                BotEngine.get().log("⏭️ Sandık bulunamadı, kaydırılıyor...");
+                autoSwipe();
+            }
+            scheduleSwipe();
+        };
+        scheduleSwipe();
     }
 
     @Override
     public void onInterrupt() {
         BotEngine.accessibilityService = null;
         BotEngine.get().log("⚠️ Erişilebilirlik servisi kesildi");
+        if (handler != null) handler.removeCallbacksAndMessages(null);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         BotEngine.accessibilityService = null;
+        if (handler != null) handler.removeCallbacksAndMessages(null);
+    }
+
+    private void scheduleSwipe() {
+        if (handler != null) {
+            handler.removeCallbacks(swipeRunnable);
+            // Her 15 saniyede bir kaydır (eğer sandık bulunmazsa)
+            handler.postDelayed(swipeRunnable, 15000);
+        }
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (!BotEngine.get().isActive()) return;
+        if (!BotEngine.get().isActive()) {
+            state = STATE_SCANNING; // reset
+            return;
+        }
 
-        // Sadece TikTok'ta çalış
         CharSequence pkg = event.getPackageName();
         if (pkg == null || !isTikTokPackage(pkg.toString())) return;
 
-        // Pencere değişimi veya içerik değişimini dinle
         int type = event.getEventType();
         if (type == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED ||
             type == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED ||
             type == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
 
-            // Cooldown kontrolü
             long now = System.currentTimeMillis();
-            if (now - lastClickTime < CLICK_COOLDOWN_MS) return;
+            if (now - lastActionTime < COOLDOWN_MS) return;
 
-            scanAndClick();
+            processScreen();
         }
     }
 
-    /**
-     * Ekranı tara, sandık/claim butonunu bul ve tıkla
-     */
-    private void scanAndClick() {
+    private void processScreen() {
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root == null) return;
 
-        BotEngine.get().updateStatus("📺 TikTok taranıyor...");
+        BotEngine.get().updateStatus("📺 TikTok taranıyor... (" + getStateName() + ")");
 
-        // Önce claim butonlarını ara (modal açıksa)
-        AccessibilityNodeInfo claimNode = findClaimButton(root);
-        if (claimNode != null) {
-            BotEngine.get().log("🎯 Claim butonu bulundu, tıklanıyor...");
-            performNodeClick(claimNode, "claim-button");
-            root.recycle();
-            return;
+        if (state == STATE_CLICKED_OPEN) {
+            // Wait for success or empty message
+            if (findAndHandleResult(root)) {
+                root.recycle();
+                return;
+            }
+        } 
+        
+        if (state == STATE_CLICKED_CHEST || state == STATE_SCANNING) {
+            // Look for Claim / Open button
+            AccessibilityNodeInfo claimNode = findNodeByKeywords(root, CLAIM_KEYWORDS);
+            if (claimNode != null) {
+                BotEngine.get().log("🎯 'Aç' butonu bulundu!");
+                performNodeClick(claimNode, "claim-button");
+                state = STATE_CLICKED_OPEN;
+                scheduleSwipe(); // prevent swipe while waiting for result
+                root.recycle();
+                return;
+            }
         }
 
-        // Treasure chest ara
-        AccessibilityNodeInfo treasureNode = findTreasureChest(root);
-        if (treasureNode != null) {
-            BotEngine.get().log("🎁 Treasure chest bulundu, tıklanıyor...");
-            performNodeClick(treasureNode, "treasure-chest");
+        if (state == STATE_SCANNING) {
+            // Look for chest
+            AccessibilityNodeInfo treasureNode = findNodeByKeywords(root, TREASURE_KEYWORDS);
+            if (treasureNode != null) {
+                BotEngine.get().log("🎁 Sandık bulundu!");
+                performNodeClick(treasureNode, "treasure-chest");
+                state = STATE_CLICKED_CHEST;
+                scheduleSwipe(); // reset timeout
+            }
         }
 
         root.recycle();
     }
 
-    /**
-     * Treasure chest node'unu bul
-     */
-    private AccessibilityNodeInfo findTreasureChest(AccessibilityNodeInfo root) {
-        return findNodeByKeywords(root, TREASURE_KEYWORDS, true);
+    private boolean findAndHandleResult(AccessibilityNodeInfo root) {
+        // Success check
+        AccessibilityNodeInfo successNode = findNodeByKeywords(root, SUCCESS_KEYWORDS);
+        if (successNode != null) {
+            BotEngine.get().onCoinCollected("success-dialog");
+            state = STATE_SCANNING;
+            closeDialogAndSwipe();
+            return true;
+        }
+
+        // Empty check
+        AccessibilityNodeInfo emptyNode = findNodeByKeywords(root, EMPTY_KEYWORDS);
+        if (emptyNode != null) {
+            BotEngine.get().log("❌ Sandık boş çıktı veya bitti.");
+            state = STATE_SCANNING;
+            closeDialogAndSwipe();
+            return true;
+        }
+        
+        return false;
     }
 
-    /**
-     * Claim butonu node'unu bul (modal içinde)
-     */
-    private AccessibilityNodeInfo findClaimButton(AccessibilityNodeInfo root) {
-        // Button veya tıklanabilir node'lar içinde ara
-        return findNodeByKeywords(root, CLAIM_KEYWORDS, false);
+    private void closeDialogAndSwipe() {
+        // Just swipe to move to the next stream, closing any dialog implicitly in TikTok
+        handler.postDelayed(() -> {
+            autoSwipe();
+            scheduleSwipe();
+        }, 1500);
     }
 
-    /**
-     * Verilen anahtar kelimelerle node ağacını tara
-     * @param onlySmall: true = sadece küçük boyutlu elementler (sandık boyutu)
-     */
-    private AccessibilityNodeInfo findNodeByKeywords(
-            AccessibilityNodeInfo node,
-            String[] keywords,
-            boolean onlySmall) {
-
+    private AccessibilityNodeInfo findNodeByKeywords(AccessibilityNodeInfo node, String[] keywords) {
         if (node == null) return null;
 
-        // Bu node'un metinlerini kontrol et
         String contentDesc = node.getContentDescription() != null
             ? node.getContentDescription().toString().toLowerCase() : "";
         String text = node.getText() != null
             ? node.getText().toString().toLowerCase() : "";
-        String viewId = node.getViewIdResourceName() != null
-            ? node.getViewIdResourceName().toLowerCase() : "";
-        String combined = contentDesc + " " + text + " " + viewId;
+        
+        String combined = contentDesc + " " + text;
 
         for (String kw : keywords) {
             if (combined.contains(kw)) {
-                // Tıklanabilir mi?
-                if (node.isClickable() && node.isVisibleToUser()) {
-                    return node;
-                }
-                // Parent'ı tıklanabilir mi?
+                if (node.isClickable() && node.isVisibleToUser()) return node;
                 AccessibilityNodeInfo parent = node.getParent();
-                if (parent != null && parent.isClickable() && parent.isVisibleToUser()) {
-                    return parent;
-                }
+                if (parent != null && parent.isClickable() && parent.isVisibleToUser()) return parent;
             }
         }
 
-        // Alt elementleri tara
         for (int i = 0; i < node.getChildCount(); i++) {
             AccessibilityNodeInfo child = node.getChild(i);
-            AccessibilityNodeInfo result = findNodeByKeywords(child, keywords, onlySmall);
+            AccessibilityNodeInfo result = findNodeByKeywords(child, keywords);
             if (result != null) return result;
             if (child != null) child.recycle();
         }
@@ -177,65 +207,65 @@ public class BotAccessibilityService extends AccessibilityService {
         return null;
     }
 
-    /**
-     * Node'a tıkla
-     */
     private void performNodeClick(AccessibilityNodeInfo node, String source) {
         try {
             boolean clicked = node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            if (clicked) {
-                lastClickTime = System.currentTimeMillis();
-                BotEngine.get().onCoinCollected(source);
-            } else {
-                // Node tıklanamadı — koordinat bazlı gesture dene
+            lastActionTime = System.currentTimeMillis();
+            if (!clicked) {
                 android.graphics.Rect bounds = new android.graphics.Rect();
                 node.getBoundsInScreen(bounds);
-                float cx = bounds.exactCenterX();
-                float cy = bounds.exactCenterY();
-                performTapGesture(cx, cy, source);
+                performTapGesture(bounds.exactCenterX(), bounds.exactCenterY());
             }
         } catch (Exception e) {
             BotEngine.get().log("❌ Tıklama hatası: " + e.getMessage());
         }
     }
 
-    /**
-     * Koordinat bazlı dokunma simülasyonu (API 24+)
-     */
-    public void performTapGesture(float x, float y, String source) {
+    private void performTapGesture(float x, float y) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
-
         Path path = new Path();
         path.moveTo(x, y);
-
-        GestureDescription.StrokeDescription stroke =
-            new GestureDescription.StrokeDescription(path, 0, 100);
-
         GestureDescription gesture = new GestureDescription.Builder()
-            .addStroke(stroke)
+            .addStroke(new GestureDescription.StrokeDescription(path, 0, 100))
             .build();
-
-        dispatchGesture(gesture, new GestureResultCallback() {
-            @Override
-            public void onCompleted(GestureDescription gestureDescription) {
-                lastClickTime = System.currentTimeMillis();
-                BotEngine.get().onCoinCollected(source + "-gesture");
-            }
-
-            @Override
-            public void onCancelled(GestureDescription gestureDescription) {
-                BotEngine.get().log("⚠️ Gesture iptal edildi");
-            }
-        }, null);
+        dispatchGesture(gesture, null, null);
     }
 
-    /**
-     * TikTok paketi mi?
-     */
+    private void autoSwipe() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+        
+        // Ekrani yukari kaydir (Swipe up)
+        android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+        float startX = metrics.widthPixels / 2f;
+        float startY = metrics.heightPixels * 0.8f;
+        float endY = metrics.heightPixels * 0.2f;
+
+        Path path = new Path();
+        path.moveTo(startX, startY);
+        path.lineTo(startX, endY);
+
+        GestureDescription gesture = new GestureDescription.Builder()
+            .addStroke(new GestureDescription.StrokeDescription(path, 0, 300))
+            .build();
+        
+        dispatchGesture(gesture, null, null);
+        lastActionTime = System.currentTimeMillis();
+        state = STATE_SCANNING; // Reset state
+    }
+
     private boolean isTikTokPackage(String pkg) {
         for (String p : TIKTOK_PACKAGES) {
             if (pkg.equals(p)) return true;
         }
         return false;
+    }
+
+    private String getStateName() {
+        switch(state) {
+            case STATE_SCANNING: return "Ara";
+            case STATE_CLICKED_CHEST: return "Sandık Bekleniyor";
+            case STATE_CLICKED_OPEN: return "Açılıyor";
+            default: return "";
+        }
     }
 }
