@@ -137,6 +137,102 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- İzin Külüstürü Kapandıktan Sonra Özel Template Seçimi -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Şablon Fotoğrafları (Zorunlu)"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_marginBottom="24dp">
+
+            <!-- Şablon 1 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/img_tpl_chest"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@android:color/darker_gray"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_camera" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sandık\nİkonu"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Şablon 2 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/img_tpl_open"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@android:color/darker_gray"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_camera" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Aç Butonu\nYazısı"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+
+            <!-- Şablon 3 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/img_tpl_empty"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@android:color/darker_gray"
+                    android:scaleType="centerInside"
+                    android:src="@android:drawable/ic_menu_camera" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Boş Çıktı\nBildirimi"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- Başlat Butonu -->
         <Button
             android:id="@+id/btn_start_overlay"

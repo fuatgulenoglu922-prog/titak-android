@@ -100,11 +100,13 @@ public class BotEngine {
 
     private long lastActionTime = 0;
     private int noChestCount = 0;
+    private boolean isWatchingChest = false;
 
     public void requestTap(float x, float y) {
         if (accessibilityService != null) {
             accessibilityService.performTapGesture(x, y);
             noChestCount = 0; // reset
+            isWatchingChest = false;
         } else {
             log("❌ Erişilebilirlik kapalı, tıklanamıyor!");
         }
@@ -114,20 +116,37 @@ public class BotEngine {
         if (accessibilityService != null) {
             accessibilityService.autoSwipe();
             noChestCount = 0;
+            isWatchingChest = false;
         }
+    }
+    
+    public void registerChestWatching() {
+        noChestCount = 0; // Sandık varken sayaç sıfırlanır, kaydırmaz.
+        isWatchingChest = true;
     }
 
     public void recordScan(boolean foundTarget) {
         if (foundTarget) {
             noChestCount = 0;
-            updateStatus("🎯 Hedef bulundut - Tıklanıyor");
+            // updateStatus("🎯 Hedef bulundu");
         } else {
-            noChestCount++;
-            updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/10");
-            if (noChestCount >= 10) { // Approx 15 seconds if 1.5s scan interval
-                log("⏭️ Sandık Yok. Kaydırılıyor...");
-                forceSwipe();
-                noChestCount = 0;
+            if (isWatchingChest) {
+                // Eğer daha önce sandık görüyorduysak ve şimdi hiçbir şey yoksa (veya açıldıysa), 
+                // biraz bekleyip kaydırabiliriz. Ama genelde resimler tam örtüşmeyebilir. 
+                // Buraya ufak bir tolerans koyalım.
+                noChestCount++;
+                updateStatus("👀 Sandık Kayboldu? " + noChestCount + "/5");
+                if (noChestCount >= 5) {
+                    log("⏭️ Sandık Yok Oldu. Kaydırılıyor...");
+                    forceSwipe();
+                }
+            } else {
+                noChestCount++;
+                updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/15");
+                if (noChestCount >= 15) { // 15 seconds if 1s scan interval
+                    log("⏭️ Sandık Yok. Kaydırılıyor...");
+                    forceSwipe();
+                }
             }
         }
     }

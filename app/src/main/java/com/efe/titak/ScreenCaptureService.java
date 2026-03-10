@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -14,6 +15,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,11 +26,14 @@ import android.view.WindowManager;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.TextRecognition;
-import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class ScreenCaptureService extends Service {
@@ -49,18 +54,57 @@ public class ScreenCaptureService extends Service {
 
     private Handler handler;
     private boolean isScanning = false;
-    private TextRecognizer textRecognizer;
 
-    private long lastScanTime = 0;
-    private static final long SCAN_INTERVAL_MS = 1500; // 1.5 seconds
+    private static final long SCAN_INTERVAL_MS = 1000; // 1 second for OpenCV
+
+    private Mat templateChest;
+    private Mat templateOpen;
+    private Mat templateEmpty;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        if (!OpenCVLoader.initDebug()) {
+            BotEngine.get().log("❌ OpenCV başlatılamadı!");
+        } else {
+            BotEngine.get().log("✅ OpenCV başarıyla yüklendi.");
+        }
+
+        loadTemplates();
+
         projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         handler = new Handler(Looper.getMainLooper());
-        textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         startForeground(2, buildNotification());
+    }
+
+    private void loadTemplates() {
+        templateChest = loadMatFromUri("tpl_chest");
+        templateOpen = loadMatFromUri("tpl_open");
+        templateEmpty = loadMatFromUri("tpl_empty");
+    }
+
+    private Mat loadMatFromUri(String key) {
+        try {
+            String uriStr = getSharedPreferences("bot_prefs", MODE_PRIVATE).getString(key, null);
+            if (uriStr == null) return null;
+            
+            Uri uri = Uri.parse(uriStr);
+            InputStream is = getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            if (is != null) is.close();
+
+            if (bitmap != null) {
+                Mat mat = new Mat();
+                Bitmap bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                Utils.bitmapToMat(bmp32, mat);
+                Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB); // Template matching works best on RGB/Grayscale
+                return mat;
+            }
+        } catch (Exception e) {
+            BotEngine.get().log("⚠️ Şablon Yükleme Hatası: " + key);
+        }
+        return null;
     }
 
     private Notification buildNotification() {
@@ -72,9 +116,9 @@ public class ScreenCaptureService extends Service {
         }
 
         return new NotificationCompat.Builder(this, "screen_capture")
-                .setContentTitle("titak 123 (AI)")
+                .setContentTitle("titak 123 (OpenCV)")
                 .setContentText("Ekran analiz ediliyor...")
-                .setSmallIcon(R.drawable.ic_coin) // Make sure ic_coin exists
+                .setSmallIcon(R.drawable.ic_coin)
                 .build();
     }
 
@@ -110,7 +154,6 @@ public class ScreenCaptureService extends Service {
         height = metrics.heightPixels;
         density = metrics.densityDpi;
 
-        // ImageReader for screen pixels
         imageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2);
         
         virtualDisplay = mediaProjection.createVirtualDisplay(
@@ -120,8 +163,7 @@ public class ScreenCaptureService extends Service {
         );
 
         startImagePolling();
-
-        BotEngine.get().log("🚀 AI Ekran Tarayıcı Başlatıldı");
+        BotEngine.get().log("🚀 OpenCV Ekran Tarayıcı Başlatıldı");
     }
 
     private Runnable pollRunnable;
@@ -141,8 +183,9 @@ public class ScreenCaptureService extends Service {
                     if (image != null) {
                         processImage(image);
                     } else {
-                        // Empty image, nothing rendered yet or screen hasn't changed
-                        BotEngine.get().recordScan(false); // Register that a cycle passed at least
+                        // Eğer boş frame gelirse (ekran değişmediyse) chest olmadığını varsaymamak lazım, 
+                        // ama yine de tarama kaydedilebilir.
+                        // Şimdilik pas geçiyoruz.
                     }
                 } catch (Exception e) {
                     if (image != null) image.close();
@@ -155,7 +198,10 @@ public class ScreenCaptureService extends Service {
     }
 
     private void processImage(Image image) {
-        if (isScanning) {
+        if (isScanning || templateChest == null || templateOpen == null) {
+            if (templateChest == null || templateOpen == null) {
+                BotEngine.get().updateStatus("⚠️ Lütfen Ana Ekranda Şablon Seçin!");
+            }
             image.close();
             return;
         }
@@ -171,85 +217,75 @@ public class ScreenCaptureService extends Service {
         bitmap.copyPixelsFromBuffer(buffer);
         image.close();
 
-        // Create bitmap that exactly matches screen
         Bitmap screenBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
         bitmap.recycle();
 
-        InputImage inputImage = InputImage.fromBitmap(screenBitmap, 0);
+        Mat mScreen = new Mat();
+        Utils.bitmapToMat(screenBitmap, mScreen);
+        screenBitmap.recycle();
         
-        textRecognizer.process(inputImage)
-            .addOnSuccessListener(visionText -> {
-                screenBitmap.recycle();
-                parseScreenText(visionText);
-                isScanning = false;
-            })
-            .addOnFailureListener(e -> {
-                screenBitmap.recycle();
-                isScanning = false;
-                BotEngine.get().log("❌ OCR Hatası: " + e.getMessage());
-            });
+        Imgproc.cvtColor(mScreen, mScreen, Imgproc.COLOR_RGBA2RGB);
+
+        boolean foundSomething = checkTemplates(mScreen);
+        
+        mScreen.release();
+        
+        isScanning = false;
     }
 
-    private void parseScreenText(com.google.mlkit.vision.text.Text visionText) {
-        String fullText = visionText.getText().toLowerCase();
-        
-        // Define click targets based strictly on text coordinates
-        // We look for Claim / Aç words first natively. 
-        // Then we look for Treasure chest (it might have a numeric countdown or "hazine" nearby).
+    private boolean checkTemplates(Mat screen) {
+        boolean found = false;
+        double threshold = 0.85; // %85 benzerlik
 
-        boolean foundAction = false;
-
-        for (com.google.mlkit.vision.text.Text.TextBlock block : visionText.getTextBlocks()) {
-            for (com.google.mlkit.vision.text.Text.Line line : block.getLines()) {
-                String lText = line.getText().toLowerCase();
-                
-                // 1. Success Message Detection
-                if (containsSuccess(lText)) {
-                    BotEngine.get().onCoinCollected("ai-vision-success");
-                    return;
-                }
-
-                // 2. Empty Message Detection
-                if (containsEmpty(lText)) {
-                    BotEngine.get().log("❌ Kutu boş veya bitti (AI)");
-                    BotEngine.get().forceSwipe(); // Request AccessibilityService to swipe
-                    return;
-                }
-
-                // 3. Action Buttons (Open, Claim, Aç, Topla)
-                if (containsAction(lText)) {
-                    android.graphics.Rect bbox = line.getBoundingBox();
-                    if (bbox != null) {
-                        float cx = bbox.exactCenterX();
-                        float cy = bbox.exactCenterY();
-                        BotEngine.get().log("🎯 Hedef bulundut: " + lText);
-                        BotEngine.get().requestTap(cx, cy);
-                        foundAction = true;
-                        break;
-                    }
-                }
+        // 1. Önce "Boş / Bitti" şablonuna bak
+        if (templateEmpty != null) {
+            Point p = match(screen, templateEmpty, threshold);
+            if (p != null) {
+                BotEngine.get().log("❌ Sandık Bitti/Boş Şablonu Eşleşti");
+                BotEngine.get().forceSwipe();
+                return true;
             }
-            if (foundAction) break;
         }
 
-        // If nothing is found, we might want to swipe after some time
-        BotEngine.get().recordScan(foundAction);
+        // 2. Aç butonuna bak (Eğer varsa tıkla)
+        Point openPoint = match(screen, templateOpen, threshold);
+        if (openPoint != null) {
+            BotEngine.get().log("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
+            BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
+            
+            // Tıkladıktan sonra başarılı sayılır
+            BotEngine.get().onCoinCollected("opencv-match");
+            return true;
+        }
+
+        // 3. Sandık İkonuna bak (Eğer varsa bekle)
+        Point chestPoint = match(screen, templateChest, threshold);
+        if (chestPoint != null) {
+            BotEngine.get().updateStatus("🎁 Sandık Bekleniyor (Açılmadı)");
+            BotEngine.get().registerChestWatching(); 
+            return true;
+        }
+
+        // Hiçbir şey bulunamadı
+        BotEngine.get().recordScan(false);
+        return false;
     }
 
-    private boolean containsSuccess(String text) {
-        return text.contains("kazandın") || text.contains("jeton") || text.contains("tebrikler") 
-               || text.contains("got") || text.contains("kutla");
-    }
+    private Point match(Mat screen, Mat template, double threshold) {
+        if (template == null || screen.empty() || template.empty() || screen.cols() < template.cols() || screen.rows() < template.rows()) {
+            return null;
+        }
 
-    private boolean containsEmpty(String text) {
-        return text.contains("boş") || text.contains("empty") || text.contains("bitti") 
-               || text.contains("try again");
-    }
+        Mat result = new Mat();
+        Imgproc.matchTemplate(screen, template, result, Imgproc.TM_CCOEFF_NORMED);
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
 
-    private boolean containsAction(String text) {
-        return text.contains("open") || text.equals("aç") || text.contains("claim") || text.equals("al")
-               || text.contains("topla") || text.contains("receive") || text.contains("treasure")
-               || text.contains("sandık") || text.contains("gift") || text.contains("hazine");
+        result.release();
+
+        if (mmr.maxVal >= threshold) {
+            return mmr.maxLoc;
+        }
+        return null;
     }
 
     @Override
@@ -261,7 +297,11 @@ public class ScreenCaptureService extends Service {
         if (virtualDisplay != null) virtualDisplay.release();
         if (imageReader != null) imageReader.close();
         if (mediaProjection != null) mediaProjection.stop();
-        BotEngine.get().log("🛑 AI Ekran Tarayıcı Durduruldu");
+        if (templateChest != null) templateChest.release();
+        if (templateOpen != null) templateOpen.release();
+        if (templateEmpty != null) templateEmpty.release();
+        
+        BotEngine.get().log("🛑 OpenCV Ekran Tarayıcı Durduruldu");
     }
 
     @Nullable
