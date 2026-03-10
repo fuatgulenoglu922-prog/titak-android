@@ -266,12 +266,11 @@ public class ScreenCaptureService extends Service {
         if (chestPoint != null) {
             BotEngine.get().registerChestWatching(); 
             
-            // Sandığın üstüne 5 saniyede 1 kereden fazla basma (sürekli açıp kapatmaması için)
-            long now = System.currentTimeMillis();
-            if (now - lastChestTapTime > 5000) {
+            // Sandığın üstüne SADECE 1 KERE bas (sürekli açıp kapatmaması için)
+            if (!BotEngine.get().hasClickedChest()) {
                 BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Açılıyor...");
                 BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
-                lastChestTapTime = now;
+                BotEngine.get().setChestClicked(true);
             } else {
                 BotEngine.get().updateStatus("🎁 Sandık Sayacı Bekleniyor...");
             }
