@@ -237,7 +237,7 @@ public class ScreenCaptureService extends Service {
 
     private boolean checkTemplates(Mat screen) {
         boolean found = false;
-        double threshold = 0.85; // %85 benzerlik
+        double threshold = 0.75; // %75 benzerlik (Daha esnek)
 
         // 1. Önce "Boş / Bitti / Tamam" şablonuna bak
         if (templateEmpty != null) {
