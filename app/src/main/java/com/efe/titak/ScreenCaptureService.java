@@ -55,7 +55,7 @@ public class ScreenCaptureService extends Service {
     private Handler handler;
     private boolean isScanning = false;
 
-    private static final long SCAN_INTERVAL_MS = 300; // 0.3 second for fast reaction
+    private static final long SCAN_INTERVAL_MS = 30; // 30ms for super fast reaction
 
     private Mat templateChest;
     private Mat templateOpen;
@@ -237,7 +237,7 @@ public class ScreenCaptureService extends Service {
 
     private boolean checkTemplates(Mat screen) {
         boolean found = false;
-        double threshold = 0.75; // %75 benzerlik (Daha esnek)
+        double threshold = 0.65; // %65 benzerlik (Daha hassas, sandigi kacirmaz)
 
         // 1. Önce "Boş / Bitti / Tamam" şablonuna bak
         if (templateEmpty != null) {
