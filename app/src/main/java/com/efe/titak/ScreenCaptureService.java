@@ -119,31 +119,39 @@ public class ScreenCaptureService extends Service {
             imageReader.getSurface(), null, handler
         );
 
-        imageReader.setOnImageAvailableListener(reader -> {
-            if (!BotEngine.get().isActive()) return;
-            
-            long now = System.currentTimeMillis();
-            if (now - lastScanTime < SCAN_INTERVAL_MS) {
-                // Ignore too frequent frames to save battery
-                Image image = null;
-                try { image = reader.acquireLatestImage(); } catch (Exception e){}
-                if (image != null) image.close();
-                return;
-            }
-
-            Image image = null;
-            try {
-                image = reader.acquireLatestImage();
-                if (image != null) {
-                    lastScanTime = now;
-                    processImage(image);
-                }
-            } catch (Exception e) {
-                if (image != null) image.close();
-            }
-        }, handler);
+        startImagePolling();
 
         BotEngine.get().log("🚀 AI Ekran Tarayıcı Başlatıldı");
+    }
+
+    private Runnable pollRunnable;
+
+    private void startImagePolling() {
+        pollRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!BotEngine.get().isActive()) {
+                    handler.postDelayed(this, SCAN_INTERVAL_MS);
+                    return;
+                }
+
+                Image image = null;
+                try {
+                    image = imageReader.acquireLatestImage();
+                    if (image != null) {
+                        processImage(image);
+                    } else {
+                        // Empty image, nothing rendered yet or screen hasn't changed
+                        BotEngine.get().recordScan(false); // Register that a cycle passed at least
+                    }
+                } catch (Exception e) {
+                    if (image != null) image.close();
+                }
+
+                handler.postDelayed(this, SCAN_INTERVAL_MS);
+            }
+        };
+        handler.post(pollRunnable);
     }
 
     private void processImage(Image image) {
@@ -239,13 +247,17 @@ public class ScreenCaptureService extends Service {
     }
 
     private boolean containsAction(String text) {
-        return text.equals("open") || text.equals("aç") || text.equals("claim") || text.equals("al")
-               || text.equals("topla") || text.equals("receive") || text.contains("treasure");
+        return text.contains("open") || text.equals("aç") || text.contains("claim") || text.equals("al")
+               || text.contains("topla") || text.contains("receive") || text.contains("treasure")
+               || text.contains("sandık") || text.contains("gift") || text.contains("hazine");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (handler != null && pollRunnable != null) {
+            handler.removeCallbacks(pollRunnable);
+        }
         if (virtualDisplay != null) virtualDisplay.release();
         if (imageReader != null) imageReader.close();
         if (mediaProjection != null) mediaProjection.stop();
