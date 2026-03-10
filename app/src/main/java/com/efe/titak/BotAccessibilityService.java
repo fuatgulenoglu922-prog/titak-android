@@ -42,7 +42,7 @@ public class BotAccessibilityService extends AccessibilityService {
         Path path = new Path();
         path.moveTo(x, y);
         GestureDescription gesture = new GestureDescription.Builder()
-            .addStroke(new GestureDescription.StrokeDescription(path, 0, 100))
+            .addStroke(new GestureDescription.StrokeDescription(path, 0, 1))
             .build();
         dispatchGesture(gesture, null, null);
     }
