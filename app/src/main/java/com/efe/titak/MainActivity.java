@@ -43,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
         
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
+        // Şifre Koruması Kontrolü
+        boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
+        if (passEnabled && !getIntent().getBooleanExtra("unlocked", false)) {
+            startActivity(new Intent(this, LockActivity.class));
+            finish();
+            return;
+        }
+
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v + " — OpenCV Kesin Çözüm");
@@ -96,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
             stopService(new Intent(this, ScreenCaptureService.class));
             stopService(new Intent(this, OverlayService.class));
             Toast.makeText(this, "Bot durduruldu.", Toast.LENGTH_SHORT).show();
+        });
+
+        // Ayarlar Butonu
+        Button btnSettings = findViewById(R.id.btn_settings);
+        btnSettings.setOnClickListener(v -> {
+            startActivity(new Intent(this, SettingsActivity.class));
         });
     }
 

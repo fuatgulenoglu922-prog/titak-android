@@ -42,6 +42,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".LockActivity" android:exported="false" />
+
         <!-- Kayan Widget Servisi (Overlay) -->
         <service
             android:name=".OverlayService"

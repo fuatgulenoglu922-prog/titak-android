@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0A0A"
+    android:gravity="center"
+    android:padding="32dp">
+
+    <ImageView
+        android:id="@+id/iv_lock_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_coin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:tint="#FFCC00"/>
+
+    <TextView
+        android:id="@+id/tv_lock_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_lock_icon"
+        android:layout_centerHorizontal="true"
+        android:text="TITAK GÜVENLİK"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.2"/>
+
+    <TextView
+        android:id="@+id/tv_lock_sub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_lock_title"
+        android:layout_centerHorizontal="true"
+        android:text="Devam etmek için şifre girin"
+        android:textColor="#888888"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/et_lock_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_lock_sub"
+        android:layout_marginTop="40dp"
+        android:hint="Şifre"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#444444"
+        android:gravity="center"
+        android:inputType="textPassword"
+        android:backgroundTint="#FFCC00"/>
+
+    <Button
+        android:id="@+id/btn_unlock"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@id/et_lock_password"
+        android:layout_marginTop="24dp"
+        android:text="GİRİŞ YAP"
+        android:textStyle="bold"
+        android:backgroundTint="#FFCC00"
+        android:textColor="#000000"/>
+
+</RelativeLayout>
