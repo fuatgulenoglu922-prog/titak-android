@@ -76,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
             // Request Screen Recording Permission
             startActivityForResult(projectionManager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
         });
+
+        // Güncelleme butonu
+        Button btnUpdateApp = findViewById(R.id.btn_update_app);
+        btnUpdateApp.setOnClickListener(v -> {
+            UpdateManager updateManager = new UpdateManager(this);
+            updateManager.checkAndInstallUpdate();
+        });
     }
 
     private String currentImageKey;

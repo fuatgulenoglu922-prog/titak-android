@@ -246,6 +246,20 @@
             android:stateListAnimator="@null"
             style="@style/Widget.MaterialComponents.Button" />
 
+        <!-- Güncelleme Butonu -->
+        <Button
+            android:id="@+id/btn_update_app"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="🔄 Uygulamayı Güncelle"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#2196F3"
+            android:textColor="@color/white"
+            android:stateListAnimator="@null"
+            style="@style/Widget.MaterialComponents.Button" />
+
         <!-- Açıklama -->
         <TextView
             android:layout_width="match_parent"
