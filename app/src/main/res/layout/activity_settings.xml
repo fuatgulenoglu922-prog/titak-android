@@ -9,11 +9,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CORE CONFIG"
+        android:text="⚙️ Uygulama Ayarları"
         android:textColor="@color/neon_green"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:letterSpacing="0.1"
+        android:letterSpacing="0.05"
         android:layout_marginBottom="32dp"/>
 
     <LinearLayout
@@ -26,23 +26,21 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="PROTECTION PROTOCOL"
+            android:text="🔒 Güvenlik (Şifre)"
             android:textColor="@color/neon_cyan"
-            android:textSize="12sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:letterSpacing="0.1"
             android:layout_marginBottom="24dp"/>
 
         <EditText
             android:id="@+id/et_new_password"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:hint="ENTER NEW KEYCODE"
+            android:hint="Yeni Şifre Girin"
             android:textColor="@color/white"
             android:textColorHint="@color/text_low"
             android:inputType="textPassword"
             android:backgroundTint="@color/neon_green"
-            android:fontFamily="monospace"
             android:textSize="14sp"
             android:paddingHorizontal="12dp"/>
 
@@ -50,7 +48,7 @@
             android:id="@+id/btn_save_password"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="ENCRYPT &amp; SAVE"
+            android:text="Şifreyi Kaydet"
             android:backgroundTint="@color/neon_green"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -61,7 +59,7 @@
             android:id="@+id/btn_disable_password"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="RESCIND PROTECTION"
+            android:text="Şifreyi Kaldır"
             android:backgroundTint="@color/transparent"
             android:textColor="@color/neon_rose"
             android:textStyle="bold"
@@ -72,11 +70,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cyber-encryption active. Protocols will be enforced on next system initialization."
+        android:text="Şifre aktifse uygulama her açıldığında sorulacaktır."
         android:textColor="@color/text_mid"
-        android:textSize="10sp"
+        android:textSize="11sp"
         android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:fontFamily="monospace" />
+        android:gravity="center" />
 
 </LinearLayout>

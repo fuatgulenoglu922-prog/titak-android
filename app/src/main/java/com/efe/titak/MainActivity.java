@@ -53,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            tvVersion.setText("v" + v); // XML already has styling
+            tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v1.9");
+            tvVersion.setText("v2.0");
         }
 
         // Apply Entry Animations
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         btnStopBot.setOnClickListener(v -> {
             stopService(new Intent(this, ScreenCaptureService.class));
             stopService(new Intent(this, OverlayService.class));
-            Toast.makeText(this, "[ LOG: SYSTEM HALTED ]", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bot durduruldu.", Toast.LENGTH_SHORT).show();
         });
 
         // Ayarlar Butonu
@@ -185,22 +185,22 @@ public class MainActivity extends AppCompatActivity {
         boolean overlayOk = Settings.canDrawOverlays(this);
         boolean accessOk  = isAccessibilityEnabled();
 
-        // Overlay status
+        // Overlay durumu
         iconOverlay.setImageResource(overlayOk ? R.drawable.ic_check : R.drawable.ic_warning);
         iconOverlay.setColorFilter(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
-        tvOverlayStatus.setText(overlayOk ? "[ STATUS: ONLINE ]" : "[ STATUS: OFFLINE ]");
+        tvOverlayStatus.setText(overlayOk ? "✅ İzin Verildi" : "❌ İzin Gerekli — Dokunun");
         tvOverlayStatus.setTextColor(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
 
-        // Accessibility status
+        // Erişilebilirlik durumu
         iconAccessibility.setImageResource(accessOk ? R.drawable.ic_check : R.drawable.ic_warning);
         iconAccessibility.setColorFilter(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
-        tvAccessibilityStatus.setText(accessOk ? "[ STATUS: ACTIVE ]" : "[ STATUS: INACTIVE ]");
+        tvAccessibilityStatus.setText(accessOk ? "✅ Aktif" : "❌ Kapalı — Dokunun");
         tvAccessibilityStatus.setTextColor(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
 
-        // Start button
+        // Başlat butonu
         boolean ready = overlayOk && accessOk;
         btnStartOverlay.setEnabled(true);
-        btnStartOverlay.setText(ready ? "INITIALIZE CORE" : "RESOLVE PERMISSIONS");
+        btnStartOverlay.setText(ready ? "🚀 Botu Başlat" : "İzinleri Ver → Botu Başlat");
         btnStartOverlay.setAlpha(ready ? 1.0f : 0.6f);
         
         // Pulse animation for start button if ready

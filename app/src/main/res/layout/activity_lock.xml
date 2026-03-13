@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/iv_lock_icon"
         android:layout_centerHorizontal="true"
-        android:text="SECURE ACCESS"
+        android:text="TiTak GÜVENLİK"
         android:textColor="@color/neon_green"
         android:textSize="22sp"
         android:textStyle="bold"
@@ -36,10 +36,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_lock_title"
         android:layout_centerHorizontal="true"
-        android:text="AUTHORIZATION REQUIRED"
+        android:text="Devam etmek için şifre girin"
         android:textColor="@color/neon_green_dim"
-        android:textSize="10sp"
-        android:letterSpacing="0.1"
+        android:textSize="12sp"
         android:layout_marginTop="8dp"/>
 
     <EditText
@@ -48,14 +47,13 @@
         android:layout_height="64dp"
         android:layout_below="@id/tv_lock_sub"
         android:layout_marginTop="48dp"
-        android:hint="[ KEYCODE ]"
+        android:hint="Şifre"
         android:textColor="@color/white"
         android:textColorHint="@color/text_low"
         android:gravity="center"
         android:inputType="textPassword"
         android:background="@drawable/bg_neon_card"
-        android:fontFamily="monospace"
-        android:letterSpacing="0.5" />
+        android:letterSpacing="0.3" />
 
     <Button
         android:id="@+id/btn_unlock"
@@ -63,7 +61,7 @@
         android:layout_height="64dp"
         android:layout_below="@id/et_lock_password"
         android:layout_marginTop="32dp"
-        android:text="VALIDATE"
+        android:text="GİRİŞ YAP"
         android:textStyle="bold"
         android:backgroundTint="@color/neon_green"
         android:textColor="@color/black"
@@ -75,9 +73,9 @@
         android:layout_below="@id/btn_unlock"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="24dp"
-        android:text="TITAK SECURITY INTERFACE"
+        android:text="TiTak Güvenlik Sistemi"
         android:textColor="@color/text_low"
-        android:textSize="8sp"
-        android:letterSpacing="0.2" />
+        android:textSize="9sp"
+        android:letterSpacing="0.1" />
 
 </RelativeLayout>
