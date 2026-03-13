@@ -1,25 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Ana renkler -->
-    <color name="tiktok_pink">#FE2C55</color>
-    <color name="tiktok_cyan">#25F4EE</color>
+    <!-- Neon Green Cyber Palette -->
+    <color name="neon_green">#39FF14</color>
+    <color name="neon_green_dim">#1A5112</color>
+    <color name="neon_green_glow">#4D39FF14</color>
+    
+    <color name="neon_rose">#FF007F</color>
+    <color name="neon_cyan">#00FFFF</color>
 
-    <!-- Arka planlar -->
-    <color name="bg_dark">#0A0A18</color>
-    <color name="card_bg">#111124</color>
-    <color name="stat_bg">#0D0D20</color>
-    <color name="overlay_header">#0F0F22</color>
+    <!-- Cyber Dark Backgrounds -->
+    <color name="bg_cyber">#05080A</color>
+    <color name="card_cyber">#0D1117</color>
+    <color name="panel_cyber">#161B22</color>
+    
+    <!-- Status Colors -->
+    <color name="status_ok">#39FF14</color>
+    <color name="status_warn">#FF007F</color>
+    <color name="status_info">#00FFFF</color>
 
-    <!-- Durum renkleri -->
-    <color name="card_ok">#0D2A1A</color>
-    <color name="card_warn">#2A1A0D</color>
+    <!-- Text Palette -->
+    <color name="text_high">#FFFFFF</color>
+    <color name="text_neon">#39FF14</color>
+    <color name="text_mid">#8B949E</color>
+    <color name="text_low">#484F58</color>
 
-    <!-- Metin renkleri -->
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#AAAAAA</color>
-    <color name="text_dim">#555566</color>
-
-    <!-- Diğer -->
+    <!-- Legacy / Utility -->
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
+
+    <!-- Aliases for compatibility -->
+    <color name="tiktok_pink">@color/neon_rose</color>
+    <color name="tiktok_cyan">@color/neon_cyan</color>
+    <color name="bg_dark">@color/bg_cyber</color>
+    <color name="card_bg">@color/card_cyber</color>
+    <color name="card_warn">#2A0D15</color>
+    <color name="card_ok">#0D2A12</color>
+    <color name="text_primary">@color/text_high</color>
+    <color name="text_secondary">@color/text_mid</color>
+    <color name="text_dim">@color/text_low</color>
 </resources>

@@ -53,10 +53,16 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            tvVersion.setText("v" + v + " — OpenCV Kesin Çözüm");
+            tvVersion.setText("v" + v); // XML already has styling
         } catch (Exception e) {
-            tvVersion.setText("v3.1");
+            tvVersion.setText("v1.9");
         }
+
+        // Apply Entry Animations
+        android.view.animation.Animation fadeIn = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fade_in_scale);
+        cardOverlay.startAnimation(fadeIn);
+        cardAccessibility.startAnimation(fadeIn);
+        btnStartOverlay.startAnimation(fadeIn);
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
@@ -103,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         btnStopBot.setOnClickListener(v -> {
             stopService(new Intent(this, ScreenCaptureService.class));
             stopService(new Intent(this, OverlayService.class));
-            Toast.makeText(this, "Bot durduruldu.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "[ LOG: SYSTEM HALTED ]", Toast.LENGTH_SHORT).show();
         });
 
         // Ayarlar Butonu
@@ -179,21 +185,30 @@ public class MainActivity extends AppCompatActivity {
         boolean overlayOk = Settings.canDrawOverlays(this);
         boolean accessOk  = isAccessibilityEnabled();
 
-        // Overlay izni
+        // Overlay status
         iconOverlay.setImageResource(overlayOk ? R.drawable.ic_check : R.drawable.ic_warning);
-        tvOverlayStatus.setText(overlayOk ? "✅ İzin Verildi" : "❌ İzin Gerekli — Dokunun");
-        cardOverlay.setCardBackgroundColor(getColor(overlayOk ? R.color.card_ok : R.color.card_warn));
+        iconOverlay.setColorFilter(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
+        tvOverlayStatus.setText(overlayOk ? "[ STATUS: ONLINE ]" : "[ STATUS: OFFLINE ]");
+        tvOverlayStatus.setTextColor(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
 
-        // Erişilebilirlik
+        // Accessibility status
         iconAccessibility.setImageResource(accessOk ? R.drawable.ic_check : R.drawable.ic_warning);
-        tvAccessibilityStatus.setText(accessOk ? "✅ Aktif" : "❌ Kapalı — Dokunun");
-        cardAccessibility.setCardBackgroundColor(getColor(accessOk ? R.color.card_ok : R.color.card_warn));
+        iconAccessibility.setColorFilter(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
+        tvAccessibilityStatus.setText(accessOk ? "[ STATUS: ACTIVE ]" : "[ STATUS: INACTIVE ]");
+        tvAccessibilityStatus.setTextColor(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
 
-        // Başlat butonu
+        // Start button
         boolean ready = overlayOk && accessOk;
         btnStartOverlay.setEnabled(true);
-        btnStartOverlay.setText(ready ? "🚀 Botu Başlat" : "İzinleri Ver → Botu Başlat");
-        btnStartOverlay.setAlpha(ready ? 1.0f : 0.7f);
+        btnStartOverlay.setText(ready ? "INITIALIZE CORE" : "RESOLVE PERMISSIONS");
+        btnStartOverlay.setAlpha(ready ? 1.0f : 0.6f);
+        
+        // Pulse animation for start button if ready
+        if (ready) {
+            btnStartOverlay.startAnimation(android.view.animation.AnimationUtils.loadAnimation(this, R.anim.pulse_neon));
+        } else {
+            btnStartOverlay.clearAnimation();
+        }
     }
 
     private void requestOverlayPermission() {

@@ -1,142 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ekran üstü kayan widget layout -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="220dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/overlay_bg"
+    android:background="@drawable/bg_neon_card"
     android:elevation="16dp">
 
-    <!-- Başlık / Header (Sürüklenebilir) -->
+    <!-- Cyber Header (Draggable) -->
     <LinearLayout
         android:id="@+id/ov_header"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="36dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="12dp"
-        android:paddingEnd="8dp"
-        android:background="@color/overlay_header">
+        android:paddingHorizontal="12dp"
+        android:background="@color/panel_cyber">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="🪙 (efe)"
-            android:textColor="@color/tiktok_cyan"
+            android:text="TITAK CORE"
+            android:textColor="@color/neon_green"
             android:textStyle="bold"
-            android:textSize="13sp" />
+            android:textSize="10sp"
+            android:letterSpacing="0.1"
+            android:fontFamily="monospace" />
 
         <Button
             android:id="@+id/btn_ov_minimize"
-            android:layout_width="30dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:text="─"
-            android:textColor="@color/text_dim"
+            android:textColor="@color/text_mid"
             android:background="@color/transparent"
-            android:padding="4dp" />
+            android:textSize="10sp" />
 
         <ImageButton
             android:id="@+id/btn_ov_power"
-            android:layout_width="30dp"
-            android:layout_height="26dp"
-            android:background="@drawable/btn_power_bg"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@color/transparent"
             android:src="@drawable/ic_play"
+            android:tint="@color/neon_green"
             android:scaleType="centerInside"
-            android:padding="4dp"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 
-    <!-- Body (Küçültülebilir) -->
+    <!-- Body (Minimizable) -->
     <LinearLayout
         android:id="@+id/ov_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
-        <!-- İstatistikler -->
+        <!-- Metrics -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="12dp">
 
-            <!-- Oturum -->
+            <!-- Session -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:background="@color/stat_bg"
-                android:padding="6dp"
-                android:layout_marginEnd="4dp">
+                android:background="@color/panel_cyber"
+                android:padding="8dp"
+                android:layout_marginEnd="6dp">
                 <TextView
                     android:id="@+id/tv_ov_session"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textColor="@color/tiktok_cyan"
-                    android:textSize="20sp"
+                    android:textColor="@color/neon_green"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="OTURUM"
-                    android:textColor="@color/text_dim"
-                    android:textSize="8sp" />
+                    android:text="SESSION"
+                    android:textColor="@color/text_low"
+                    android:textSize="7sp"
+                    android:letterSpacing="0.1" />
             </LinearLayout>
 
-            <!-- Toplam -->
+            <!-- Total -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:background="@color/stat_bg"
-                android:padding="6dp">
+                android:background="@color/panel_cyber"
+                android:padding="8dp">
                 <TextView
                     android:id="@+id/tv_ov_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0"
-                    android:textColor="@color/tiktok_cyan"
-                    android:textSize="20sp"
+                    android:textColor="@color/neon_cyan"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TOPLAM"
-                    android:textColor="@color/text_dim"
-                    android:textSize="8sp" />
+                    android:text="TOTAL"
+                    android:textColor="@color/text_low"
+                    android:textSize="7sp"
+                    android:letterSpacing="0.1" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Durum -->
+        <!-- Dynamic Status -->
         <TextView
             android:id="@+id/tv_ov_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Durduruldu"
-            android:textColor="@color/text_secondary"
-            android:textSize="10sp"
+            android:text="[ INACTIVE ]"
+            android:textColor="@color/text_mid"
+            android:textSize="9sp"
             android:gravity="center"
+            android:fontFamily="monospace"
             android:padding="4dp" />
 
-        <!-- Son Log -->
+        <!-- Protocol Logs -->
         <TextView
             android:id="@+id/tv_ov_log"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/text_dim"
-            android:textSize="9sp"
+            android:text="> Awaiting command..."
+            android:textColor="@color/text_low"
+            android:textSize="8sp"
+            android:fontFamily="monospace"
             android:maxLines="2"
             android:ellipsize="start"
-            android:singleLine="false"
-            android:padding="2dp" />
+            android:padding="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/bg_cyber" />
     </LinearLayout>
 </LinearLayout>
