@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">tiktok 123</string>
-    <string name="accessibility_label">tiktok 123 Bot</string>
+    <string name="app_name">TİKTOKEFE</string>
+    <string name="accessibility_label">TİKTOKEFE Bot</string>
     <string name="accessibility_desc">TikTok canlı yayınlarında treasure chest sandıklarını otomatik olarak algılar ve tıklar.</string>
 </resources>
