@@ -28,7 +28,44 @@ public class UpdateManager {
     }
 
     public void checkAndInstallUpdate() {
-        new DownloadTask().execute(APK_URL);
+        new VersionCheckTask().execute("https://raw.githubusercontent.com/fuatgulenoglu922-prog/titak-android/main/version.txt");
+    }
+
+    private class VersionCheckTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                URL url = new URL(urls[0]);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(5000);
+                InputStream is = conn.getInputStream();
+                java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+                String v = s.hasNext() ? s.next().trim() : "";
+                is.close();
+                return v;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String remoteVersion) {
+            if (remoteVersion == null) {
+                Toast.makeText(context, "Versiyon kontrolü başarısız!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String localVersion = "1.0"; // Başlangıç varsayılanı
+            try {
+                localVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+            } catch (Exception ignored) {}
+
+            if (remoteVersion.equals(localVersion)) {
+                Toast.makeText(context, "Uygulamanız zaten güncel! (v" + localVersion + ")", Toast.LENGTH_LONG).show();
+            } else {
+                new DownloadTask().execute(APK_URL);
+            }
+        }
     }
 
     private class DownloadTask extends AsyncTask<String, Integer, File> {
