@@ -88,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
             UpdateManager updateManager = new UpdateManager(this);
             updateManager.checkAndInstallUpdate();
         });
+
+        // Durdur Butonu
+        Button btnStopBot = findViewById(R.id.btn_stop_bot);
+        btnStopBot.setOnClickListener(v -> {
+            stopService(new Intent(this, ScreenCaptureService.class));
+            Toast.makeText(this, "Bot durduruldu.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private String currentImageKey;
