@@ -237,12 +237,15 @@ public class ScreenCaptureService extends Service {
 
     private boolean checkTemplates(Mat screen) {
         boolean found = false;
-        double threshold = 0.65; // %65 benzerlik (Daha hassas, sandigi kacirmaz)
+        double thresholdChest = 0.55; // Sandığı daha rahat bulsun
+        double thresholdOpen = 0.50;  // Aç yazısını animasyon bitmeden çok erken bulsun
+        double thresholdEmpty = 0.60;
 
         // 1. Önce "Boş / Bitti / Tamam" şablonuna bak
         if (templateEmpty != null) {
-            Point p = match(screen, templateEmpty, threshold);
+            Point p = match(screen, templateEmpty, thresholdEmpty);
             if (p != null) {
+                // ...
                 BotEngine.get().updateStatus("❌ Tamam/Boş Butonu Eşleşti, Kapatılıyor");
                 BotEngine.get().requestTap((float) p.x + (templateEmpty.cols() / 2f), (float) p.y + (templateEmpty.rows() / 2f));
                 BotEngine.get().forceSwipe(); // Tıkladıktan sonra yayını geç
@@ -251,18 +254,18 @@ public class ScreenCaptureService extends Service {
         }
 
         // 2. Aç butonuna bak (Eğer varsa tıkla)
-        Point openPoint = match(screen, templateOpen, threshold);
+        Point openPoint = match(screen, templateOpen, thresholdOpen);
         if (openPoint != null) {
             BotEngine.get().updateStatus("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
             // Hızlıca 2 kez tıklaması için erişilebilirliğe ardarda komut gönderilebilir
-            // Fakat 300ms döngü hızı zaten saniyede 3 kez tıklayacaktır.
+            // Fakat 30ms döngü hızı zaten saniyede 33 kez tıklayacaktır.
             BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
             BotEngine.get().registerChestWatching(); 
             return true;
         }
 
         // 3. Sandık İkonuna bak (Eğer varsa tıkla ve bekle)
-        Point chestPoint = match(screen, templateChest, threshold);
+        Point chestPoint = match(screen, templateChest, thresholdChest);
         if (chestPoint != null) {
             BotEngine.get().registerChestWatching(); 
             
