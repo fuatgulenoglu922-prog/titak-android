@@ -145,17 +145,17 @@ public class BotEngine {
                 // Sandık popup'ı açıldığında arka plan kararır ve şablon eşleşmeyebilir,
                 // bu yüzden hemen kaydırmamak çok önemli.
                 noChestCount++;
-                updateStatus("⏳ Sandık Açılması Bekleniyor... " + (noChestCount * 300 / 1000) + "sn");
-                // 300ms * 400 = 120 saniye boyunca bekle (2 dakika)
-                if (noChestCount >= 400) {
+                updateStatus("⏳ Bekleniyor... " + (noChestCount * 30 / 1000) + "sn");
+                // 30ms * 4000 = 120 saniye boyunca bekle (2 dakika)
+                if (noChestCount >= 4000) {
                     log("⏭️ 2 Dakika Geçti, Sandık Açılmadı. Kaydırılıyor...");
                     forceSwipe();
                 }
             } else {
                 noChestCount++;
-                updateStatus("👀 Ekran Tarandı (Hedef yok) " + noChestCount + "/50");
-                // 300ms * 50 = 15 saniye hedef yoksa kaydır
-                if (noChestCount >= 50) { 
+                updateStatus("👀 Tarama (Hedef yok) " + noChestCount + "/500");
+                // 30ms * 500 = 15 saniye hedef yoksa kaydır
+                if (noChestCount >= 500) { 
                     log("⏭️ Sandık Yok. Kaydırılıyor...");
                     forceSwipe();
                 }
