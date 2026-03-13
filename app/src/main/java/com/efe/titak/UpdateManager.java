@@ -35,9 +35,14 @@ public class UpdateManager {
         @Override
         protected String doInBackground(String... urls) {
             try {
-                URL url = new URL(urls[0]);
+                // Add cache-busting parameter to avoid GitHub CDN caching
+                String urlStr = urls[0] + "?t=" + System.currentTimeMillis();
+                URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(5000);
+                conn.setUseCaches(false);
+                conn.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                conn.setRequestProperty("Pragma", "no-cache");
                 InputStream is = conn.getInputStream();
                 java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
                 String v = s.hasNext() ? s.next().trim() : "";
