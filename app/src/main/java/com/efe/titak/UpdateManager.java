@@ -50,19 +50,23 @@ public class UpdateManager {
 
         @Override
         protected void onPostExecute(String remoteVersion) {
-            if (remoteVersion == null) {
+            if (remoteVersion == null || remoteVersion.isEmpty()) {
                 Toast.makeText(context, "Versiyon kontrolü başarısız!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String localVersion = "1.0"; // Başlangıç varsayılanı
+            remoteVersion = remoteVersion.trim();
+            String localVersion = "1.0";
             try {
                 localVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
             } catch (Exception ignored) {}
 
+            localVersion = localVersion.trim();
+
             if (remoteVersion.equals(localVersion)) {
-                Toast.makeText(context, "Uygulamanız zaten güncel! (v" + localVersion + ")", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
             } else {
+                Toast.makeText(context, "Yeni sürüm bulundu: v" + remoteVersion + " (Mevcut: v" + localVersion + ")", Toast.LENGTH_SHORT).show();
                 new DownloadTask().execute(APK_URL);
             }
         }

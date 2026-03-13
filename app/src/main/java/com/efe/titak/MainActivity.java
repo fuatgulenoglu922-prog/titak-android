@@ -42,7 +42,12 @@ public class MainActivity extends AppCompatActivity {
         
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
-        tvVersion.setText("v3.0 — OpenCV Kesin Çözüm");
+        try {
+            String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            tvVersion.setText("v" + v + " — OpenCV Kesin Çözüm");
+        } catch (Exception e) {
+            tvVersion.setText("v3.1");
+        }
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
