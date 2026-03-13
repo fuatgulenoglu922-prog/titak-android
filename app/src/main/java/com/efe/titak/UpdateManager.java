@@ -151,7 +151,7 @@ public class UpdateManager {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri apkUri;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            apkUri = FileProvider.getUriForFile(context, "com.efe.titak.fileprovider", file);
+            apkUri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } else {
             apkUri = Uri.fromFile(file);
