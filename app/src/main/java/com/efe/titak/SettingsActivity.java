@@ -30,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
                     .apply();
             Toast.makeText(this, "Şifre kaydedildi ve aktif edildi.", Toast.LENGTH_SHORT).show();
             finish();
+            overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
         });
 
         btnDisable.setOnClickListener(v -> {
@@ -39,6 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
                     .apply();
             Toast.makeText(this, "Şifre koruması kaldırıldı.", Toast.LENGTH_SHORT).show();
             finish();
+            overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
         });
     }
 }

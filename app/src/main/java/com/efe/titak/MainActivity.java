@@ -55,14 +55,19 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.0");
+            tvVersion.setText("v2.1");
         }
 
-        // Apply Entry Animations
+        // Sıralı giriş animasyonları (stagger)
+        android.view.animation.Animation cardAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.card_stagger);
+        android.view.animation.Animation cardAnim2 = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.card_stagger);
         android.view.animation.Animation fadeIn = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fade_in_scale);
-        cardOverlay.startAnimation(fadeIn);
-        cardAccessibility.startAnimation(fadeIn);
-        btnStartOverlay.startAnimation(fadeIn);
+        cardAnim2.setStartOffset(80);
+        fadeIn.setStartOffset(160);
+        cardOverlay.startAnimation(cardAnim);
+        cardAccessibility.startAnimation(cardAnim2);
+        android.view.View btnCard = (android.view.View) btnStartOverlay.getParent();
+        if (btnCard != null) btnCard.startAnimation(fadeIn);
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
@@ -112,10 +117,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Bot durduruldu.", Toast.LENGTH_SHORT).show();
         });
 
-        // Ayarlar Butonu
+        // Ayarlar Butonu — animasyonlu geçiş
         Button btnSettings = findViewById(R.id.btn_settings);
         btnSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
+            overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
         });
     }
 
@@ -200,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         // Başlat butonu
         boolean ready = overlayOk && accessOk;
         btnStartOverlay.setEnabled(true);
-        btnStartOverlay.setText(ready ? "🚀 Botu Başlat" : "İzinleri Ver → Botu Başlat");
+        btnStartOverlay.setText(ready ? "Botu başlat" : "İzinleri ver → Botu başlat");
         btnStartOverlay.setAlpha(ready ? 1.0f : 0.6f);
         
         // Pulse animation for start button if ready

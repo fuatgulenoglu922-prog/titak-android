@@ -3,82 +3,58 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_cyber">
+    android:background="@color/bg_cyber"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
-        <!-- Başlık -->
+        <!-- Başlık — sade -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="24dp">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🪙 TiTak"
-                    android:textSize="24sp"
-                    android:textColor="@color/neon_green"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Otomatik Sandık Botu"
-                    android:textSize="10sp"
-                    android:textColor="@color/neon_green_dim"
-                    android:letterSpacing="0.1" />
-            </LinearLayout>
+                android:text="TiTak"
+                android:textSize="22sp"
+                android:textColor="@color/neon_green"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
             <TextView
                 android:id="@+id/tv_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textColor="@color/neon_cyan"
                 android:background="@drawable/bg_neon_card"
-                android:paddingHorizontal="12dp"
+                android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Sistem Durumu -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SİSTEM DURUMU"
-            android:textColor="@color/text_mid"
-            android:textSize="11sp"
-            android:letterSpacing="0.1"
-            android:layout_marginBottom="12dp" />
-
-        <!-- İzin Kartları -->
+        <!-- İzin kartları — kompakt -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="24dp">
 
-            <!-- Ekran Üstü İzni -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_overlay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/transparent">
 
@@ -87,15 +63,15 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_neon_card"
                     android:gravity="center_vertical"
-                    android:padding="20dp">
+                    android:padding="14dp">
 
                     <ImageView
                         android:id="@+id/icon_overlay"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_warning"
                         android:tint="@color/neon_green"
-                        android:layout_marginEnd="16dp" />
+                        android:layout_marginEnd="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -106,29 +82,28 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ekran Üstü İzni"
+                            android:text="Ekran üstü izni"
                             android:textColor="@color/text_high"
                             android:textStyle="bold"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tv_overlay_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="❌ İzin Gerekli — Dokunun"
+                            android:text="❌ İzin gerekli"
                             android:textColor="@color/neon_rose"
-                            android:textSize="11sp"
-                            android:layout_marginTop="4dp" />
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Erişilebilirlik Servisi -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_accessibility"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/transparent">
 
@@ -137,15 +112,15 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_neon_card"
                     android:gravity="center_vertical"
-                    android:padding="20dp">
+                    android:padding="14dp">
 
                     <ImageView
                         android:id="@+id/icon_accessibility"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:src="@drawable/ic_warning"
                         android:tint="@color/neon_green"
-                        android:layout_marginEnd="16dp" />
+                        android:layout_marginEnd="12dp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -156,54 +131,52 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Erişilebilirlik Servisi"
+                            android:text="Erişilebilirlik servisi"
                             android:textColor="@color/text_high"
                             android:textStyle="bold"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/tv_accessibility_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="❌ Kapalı — Dokunun"
+                            android:text="❌ Kapalı"
                             android:textColor="@color/neon_rose"
-                            android:textSize="11sp"
-                            android:layout_marginTop="4dp" />
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- Şablon Fotoğrafları -->
+        <!-- Şablonlar — sade başlık -->
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Şablon Fotoğrafları (Zorunlu)"
-            android:textColor="@color/text_high"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginBottom="16dp" />
+            android:text="Şablon fotoğrafları"
+            android:textColor="@color/text_mid"
+            android:textSize="11sp"
+            android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="3"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="24dp">
 
-            <!-- Sandık İkonu -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp">
+                android:padding="6dp">
 
                 <ImageView
                     android:id="@+id/img_tpl_chest"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:background="@drawable/bg_neon_card"
                     android:padding="4dp"
                     android:scaleType="centerCrop"
@@ -211,26 +184,25 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sandık\nİkonu"
+                    android:text="Sandık"
                     android:gravity="center"
                     android:textSize="10sp"
                     android:textColor="@color/text_neon"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
 
-            <!-- Aç Butonu -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp">
+                android:padding="6dp">
 
                 <ImageView
                     android:id="@+id/img_tpl_open"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:background="@drawable/bg_neon_card"
                     android:padding="4dp"
                     android:scaleType="centerCrop"
@@ -238,26 +210,25 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Aç Butonu\nYazısı"
+                    android:text="Aç butonu"
                     android:gravity="center"
                     android:textSize="10sp"
                     android:textColor="@color/text_neon"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
 
-            <!-- Boş Çıktı -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp">
+                android:padding="6dp">
 
                 <ImageView
                     android:id="@+id/img_tpl_empty"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:background="@drawable/bg_neon_card"
                     android:padding="4dp"
                     android:scaleType="centerCrop"
@@ -265,29 +236,29 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Boş Çıktı\nBildirimi"
+                    android:text="Boş çıktı"
                     android:gravity="center"
                     android:textSize="10sp"
                     android:textColor="@color/text_neon"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Ana Butonlar -->
+        <!-- Ana butonlar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="8dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
             app:cardBackgroundColor="@color/transparent"
-            android:layout_marginBottom="16dp">
-            
+            android:layout_marginBottom="12dp">
+
             <Button
                 android:id="@+id/btn_start_overlay"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:text="🚀 Botu Başlat"
-                android:textSize="16sp"
+                android:layout_height="56dp"
+                android:text="Botu başlat"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:background="@drawable/btn_neon_main"
                 android:textColor="@color/black"
@@ -298,29 +269,29 @@
         <Button
             android:id="@+id/btn_stop_bot"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="🛑 Botu Durdur"
-            android:textSize="14sp"
+            android:layout_height="48dp"
+            android:text="Durdur"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:backgroundTint="@color/transparent"
             android:textColor="@color/neon_rose"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="2"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="20dp">
 
             <Button
                 android:id="@+id/btn_update_app"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="🔄 Güncelle"
+                android:layout_marginEnd="6dp"
+                android:text="Güncelle"
                 android:textSize="12sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/neon_cyan"
@@ -329,27 +300,25 @@
             <Button
                 android:id="@+id/btn_settings"
                 android:layout_width="0dp"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="⚙️ Ayarlar"
+                android:layout_marginStart="6dp"
+                android:text="Ayarlar"
                 android:textSize="12sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/text_high"
                 style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>
 
-        <!-- Bilgi -->
+        <!-- Bilgi — kısa -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
+            android:padding="14dp"
             android:background="@drawable/bg_neon_card"
-            android:text="ℹ️ Bot başladıktan sonra TikTok'u aç. Uygulama arka planda çalışır ve ekranın üstünde kayan kontrol paneli görünür.\n\nTikTok LIVE'da sandık belirdiğinde bot otomatik olarak tıklar."
+            android:text="Botu başlattıktan sonra TikTok'u açın. Sandık görününce otomatik tıklar."
             android:textColor="@color/text_mid"
             android:textSize="11sp"
-            android:lineSpacingExtra="4dp"
-            android:fontFamily="monospace" />
-
+            android:lineSpacingExtra="2dp" />
     </LinearLayout>
 </ScrollView>

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Animasyonlu tema geçişleri -->
+    <style name="Theme.Titak.Animation">
+        <item name="android:activityOpenEnterAnimation">@anim/theme_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/theme_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/theme_enter_reverse</item>
+        <item name="android:activityCloseExitAnimation">@anim/theme_exit_reverse</item>
+    </style>
+
     <style name="Theme.Titak" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/neon_green</item>
         <item name="colorPrimaryVariant">@color/neon_green_dim</item>
@@ -9,6 +17,7 @@
         <item name="android:windowBackground">@color/bg_cyber</item>
         <item name="android:statusBarColor">@color/bg_cyber</item>
         <item name="android:navigationBarColor">@color/bg_cyber</item>
+        <item name="android:windowAnimationStyle">@style/Theme.Titak.Animation</item>
     </style>
 
 </resources>

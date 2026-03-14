@@ -26,6 +26,7 @@ public class LockActivity extends AppCompatActivity {
                 intent.putExtra("unlocked", true);
                 startActivity(intent);
                 finish();
+                overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
             } else {
                 Toast.makeText(this, "Hatalı Şifre!", Toast.LENGTH_SHORT).show();
             }

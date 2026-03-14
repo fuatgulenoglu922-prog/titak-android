@@ -3,77 +3,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="20dp"
     android:background="@color/bg_cyber">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="⚙️ Uygulama Ayarları"
+        android:text="Ayarlar"
         android:textColor="@color/neon_green"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:letterSpacing="0.05"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="24dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_neon_card"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔒 Güvenlik (Şifre)"
+            android:text="Şifre koruması"
             android:textColor="@color/neon_cyan"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/et_new_password"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:hint="Yeni Şifre Girin"
+            android:layout_height="48dp"
+            android:hint="Yeni şifre"
             android:textColor="@color/white"
             android:textColorHint="@color/text_low"
             android:inputType="textPassword"
             android:backgroundTint="@color/neon_green"
             android:textSize="14sp"
-            android:paddingHorizontal="12dp"/>
+            android:paddingHorizontal="12dp" />
 
         <Button
             android:id="@+id/btn_save_password"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Şifreyi Kaydet"
+            android:layout_height="48dp"
+            android:text="Kaydet"
             android:backgroundTint="@color/neon_green"
             android:textColor="@color/black"
             android:textStyle="bold"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             style="@style/Widget.MaterialComponents.Button" />
 
         <Button
             android:id="@+id/btn_disable_password"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Şifreyi Kaldır"
+            android:layout_height="48dp"
+            android:text="Şifreyi kaldır"
             android:backgroundTint="@color/transparent"
             android:textColor="@color/neon_rose"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             style="@style/Widget.MaterialComponents.Button.TextButton" />
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Şifre aktifse uygulama her açıldığında sorulacaktır."
+        android:text="Şifre açıldığında her girişte sorulur."
         android:textColor="@color/text_mid"
-        android:textSize="11sp"
-        android:layout_marginTop="16dp"
+        android:textSize="10sp"
+        android:layout_marginTop="12dp"
         android:gravity="center" />
-
 </LinearLayout>
