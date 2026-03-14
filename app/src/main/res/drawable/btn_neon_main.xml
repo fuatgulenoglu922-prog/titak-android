@@ -4,11 +4,7 @@
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="28dp" />
-            <gradient
-                android:startColor="@color/neon_green"
-                android:endColor="@color/neon_green_dim"
-                android:angle="45" />
-            <stroke android:width="2dp" android:color="@color/neon_green_glow" />
+            <solid android:color="@color/primary_blue" />
         </shape>
     </item>
 </ripple>

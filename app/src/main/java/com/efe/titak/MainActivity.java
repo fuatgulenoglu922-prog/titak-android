@@ -117,6 +117,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
         });
+
+        // Geri Bildirim Butonu
+        Button btnFeedback = findViewById(R.id.btn_feedback);
+        btnFeedback.setOnClickListener(v -> {
+            startActivity(new Intent(this, FeedbackActivity.class));
+        });
     }
 
     private String currentImageKey;
@@ -187,15 +193,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Overlay durumu
         iconOverlay.setImageResource(overlayOk ? R.drawable.ic_check : R.drawable.ic_warning);
-        iconOverlay.setColorFilter(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
+        iconOverlay.setColorFilter(getColor(overlayOk ? R.color.accent_green : R.color.accent_red));
         tvOverlayStatus.setText(overlayOk ? "✅ İzin Verildi" : "❌ İzin Gerekli — Dokunun");
-        tvOverlayStatus.setTextColor(getColor(overlayOk ? R.color.neon_green : R.color.neon_rose));
+        tvOverlayStatus.setTextColor(getColor(overlayOk ? R.color.accent_green : R.color.accent_red));
 
         // Erişilebilirlik durumu
         iconAccessibility.setImageResource(accessOk ? R.drawable.ic_check : R.drawable.ic_warning);
-        iconAccessibility.setColorFilter(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
+        iconAccessibility.setColorFilter(getColor(accessOk ? R.color.accent_green : R.color.accent_red));
         tvAccessibilityStatus.setText(accessOk ? "✅ Aktif" : "❌ Kapalı — Dokunun");
-        tvAccessibilityStatus.setTextColor(getColor(accessOk ? R.color.neon_green : R.color.neon_rose));
+        tvAccessibilityStatus.setTextColor(getColor(accessOk ? R.color.accent_green : R.color.accent_red));
 
         // Başlat butonu
         boolean ready = overlayOk && accessOk;
@@ -242,17 +248,33 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isAccessibilityEnabled() {
         try {
-            String service = getPackageName() + "/" + BotAccessibilityService.class.getCanonicalName();
-            int enabled = Settings.Secure.getInt(
-                getContentResolver(),
-                Settings.Secure.ACCESSIBILITY_ENABLED, 0
-            );
-            if (enabled != 1) return false;
-            String settingValue = Settings.Secure.getString(
-                getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            );
-            return settingValue != null && settingValue.contains(service);
+            android.view.accessibility.AccessibilityManager am = (android.view.accessibility.AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
+            if (am == null) return false;
+            
+            // Use AccessibilityManager to get enabled services (more reliable on Android 14+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                java.util.List<android.view.accessibility.AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(android.view.accessibility.AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+                String serviceName = BotAccessibilityService.class.getName();
+                for (android.view.accessibility.AccessibilityServiceInfo service : enabledServices) {
+                    if (service.getId().contains(serviceName)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                // Fallback for older versions
+                String service = getPackageName() + "/" + BotAccessibilityService.class.getCanonicalName();
+                int enabled = Settings.Secure.getInt(
+                    getContentResolver(),
+                    Settings.Secure.ACCESSIBILITY_ENABLED, 0
+                );
+                if (enabled != 1) return false;
+                String settingValue = Settings.Secure.getString(
+                    getContentResolver(),
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                );
+                return settingValue != null && settingValue.contains(service);
+            }
         } catch (Exception e) {
             return false;
         }

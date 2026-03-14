@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Neon Green Cyber Palette -->
-    <color name="neon_green">#39FF14</color>
-    <color name="neon_green_dim">#1A5112</color>
-    <color name="neon_green_glow">#4D39FF14</color>
+    <!-- Minimalist Professional Palette -->
+    <!-- Primary Colors -->
+    <color name="primary_blue">#1E3A8A</color>
+    <color name="primary_light">#3B82F6</color>
+    <color name="primary_dark">#1E293B</color>
     
-    <color name="neon_rose">#FF007F</color>
-    <color name="neon_cyan">#00FFFF</color>
+    <!-- Accent Colors -->
+    <color name="accent_green">#10B981</color>
+    <color name="accent_red">#EF4444</color>
+    <color name="accent_yellow">#F59E0B</color>
 
-    <!-- Cyber Dark Backgrounds -->
-    <color name="bg_cyber">#05080A</color>
-    <color name="card_cyber">#0D1117</color>
-    <color name="panel_cyber">#161B22</color>
+    <!-- Neutral Backgrounds -->
+    <color name="bg_dark">#0F172A</color>
+    <color name="bg_card">#1E293B</color>
+    <color name="bg_panel">#334155</color>
     
     <!-- Status Colors -->
-    <color name="status_ok">#39FF14</color>
-    <color name="status_warn">#FF007F</color>
-    <color name="status_info">#00FFFF</color>
+    <color name="status_ok">#10B981</color>
+    <color name="status_warn">#EF4444</color>
+    <color name="status_info">#3B82F6</color>
 
     <!-- Text Palette -->
     <color name="text_high">#FFFFFF</color>
-    <color name="text_neon">#39FF14</color>
-    <color name="text_mid">#8B949E</color>
-    <color name="text_low">#484F58</color>
+    <color name="text_primary">#E2E8F0</color>
+    <color name="text_mid">#94A3B8</color>
+    <color name="text_low">#64748B</color>
 
-    <!-- Legacy / Utility -->
+    <!-- Utility -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
 
     <!-- Aliases for compatibility -->
-    <color name="tiktok_pink">@color/neon_rose</color>
-    <color name="tiktok_cyan">@color/neon_cyan</color>
-    <color name="bg_dark">@color/bg_cyber</color>
-    <color name="card_bg">@color/card_cyber</color>
-    <color name="card_warn">#2A0D15</color>
-    <color name="card_ok">#0D2A12</color>
+    <color name="neon_green">@color/accent_green</color>
+    <color name="neon_rose">@color/accent_red</color>
+    <color name="neon_cyan">@color/status_info</color>
+    <color name="bg_cyber">@color/bg_dark</color>
+    <color name="card_cyber">@color/bg_card</color>
+    <color name="panel_cyber">@color/bg_panel</color>
+    <color name="text_neon">@color/accent_green</color>
+    <color name="card_warn">#3F1E1E</color>
+    <color name="card_ok">#1E3F2E</color>
     <color name="text_primary">@color/text_high</color>
     <color name="text_secondary">@color/text_mid</color>
     <color name="text_dim">@color/text_low</color>

@@ -26,7 +26,7 @@
                 android:layout_weight="1"
                 android:text="TiTak"
                 android:textSize="22sp"
-                android:textColor="@color/neon_green"
+                android:textColor="@color/text_high"
                 android:textStyle="bold"
                 android:letterSpacing="0.05" />
 
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="11sp"
-                android:textColor="@color/neon_cyan"
+                android:textColor="@color/status_info"
                 android:background="@drawable/bg_neon_card"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
@@ -92,7 +92,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="❌ İzin gerekli"
-                            android:textColor="@color/neon_rose"
+                            android:textColor="@color/accent_red"
                             android:textSize="10sp"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
@@ -141,7 +141,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="❌ Kapalı"
-                            android:textColor="@color/neon_rose"
+                            android:textColor="@color/accent_red"
                             android:textSize="10sp"
                             android:layout_marginTop="2dp" />
                     </LinearLayout>
@@ -181,14 +181,14 @@
                     android:padding="4dp"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sandık"
-                    android:gravity="center"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_neon"
-                    android:layout_marginTop="6dp" />
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Sandık"
+                     android:gravity="center"
+                     android:textSize="10sp"
+                     android:textColor="@color/accent_green"
+                     android:layout_marginTop="6dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -207,14 +207,14 @@
                     android:padding="4dp"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Aç butonu"
-                    android:gravity="center"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_neon"
-                    android:layout_marginTop="6dp" />
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Aç butonu"
+                     android:gravity="center"
+                     android:textSize="10sp"
+                     android:textColor="@color/accent_green"
+                     android:layout_marginTop="6dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -233,14 +233,14 @@
                     android:padding="4dp"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Boş çıktı"
-                    android:gravity="center"
-                    android:textSize="10sp"
-                    android:textColor="@color/text_neon"
-                    android:layout_marginTop="6dp" />
+                 <TextView
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="Boş çıktı"
+                     android:gravity="center"
+                     android:textSize="10sp"
+                     android:textColor="@color/accent_green"
+                     android:layout_marginTop="6dp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -266,23 +266,23 @@
                 style="@style/Widget.MaterialComponents.Button" />
         </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/btn_stop_bot"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Durdur"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:backgroundTint="@color/transparent"
-            android:textColor="@color/neon_rose"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_marginBottom="12dp" />
+            <Button
+                android:id="@+id/btn_stop_bot"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Durdur"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/transparent"
+                android:textColor="@color/accent_red"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="2"
+            android:weightSum="3"
             android:layout_marginBottom="20dp">
 
             <Button
@@ -290,11 +290,11 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
+                android:layout_marginEnd="4dp"
                 android:text="Güncelle"
                 android:textSize="12sp"
                 android:backgroundTint="@color/panel_cyber"
-                android:textColor="@color/neon_cyan"
+                android:textColor="@color/status_info"
                 style="@style/Widget.MaterialComponents.Button" />
 
             <Button
@@ -302,11 +302,23 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
+                android:layout_marginEnd="4dp"
                 android:text="Ayarlar"
                 android:textSize="12sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/text_high"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
+                android:id="@+id/btn_feedback"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="Geri Bildirim"
+                android:textSize="12sp"
+                android:backgroundTint="@color/panel_cyber"
+                android:textColor="@color/accent_green"
                 style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>
 

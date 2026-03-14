@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Animasyonlu tema geçişleri -->
+    <!-- Minimalist Animation (Subtle) -->
     <style name="Theme.Titak.Animation">
         <item name="android:activityOpenEnterAnimation">@anim/theme_enter</item>
         <item name="android:activityOpenExitAnimation">@anim/theme_exit</item>
@@ -10,14 +10,16 @@
     </style>
 
     <style name="Theme.Titak" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/neon_green</item>
-        <item name="colorPrimaryVariant">@color/neon_green_dim</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <item name="colorSecondary">@color/neon_cyan</item>
-        <item name="android:windowBackground">@color/bg_cyber</item>
-        <item name="android:statusBarColor">@color/bg_cyber</item>
-        <item name="android:navigationBarColor">@color/bg_cyber</item>
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accent_green</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="android:navigationBarColor">@color/bg_dark</item>
         <item name="android:windowAnimationStyle">@style/Theme.Titak.Animation</item>
+        <item name="colorSurface">@color/bg_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
     </style>
 
 </resources>
