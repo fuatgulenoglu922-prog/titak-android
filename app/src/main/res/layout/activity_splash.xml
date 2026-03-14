@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/bg_cyber">
+
+    <!-- İkon veya Logo (isteğe bağlı) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="T"
+        android:textSize="80sp"
+        android:textColor="@color/neon_green"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Alt Yazı -->
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Uygulama Ali Sağlam tarafından yapılmıştır\nProfosyone kod ve metin yazarı"
+        android:textColor="@color/neon_rose"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:lineSpacingExtra="4dp"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Versiyon -->
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="v2.3"
+        android:textColor="@color/text_mid"
+        android:textSize="12sp"
+        android:layout_marginBottom="32dp" />
+
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tamam"
+        android:textColor="@color/black"
+        android:background="@drawable/btn_neon_main"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp" />
+
+</LinearLayout>

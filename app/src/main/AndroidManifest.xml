@@ -31,16 +31,23 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- Ana Ekran -->
+        <!-- Splash Screen -->
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Titak">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Ana Ekran -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity android:name=".SettingsActivity" android:exported="false" />
         <activity android:name=".LockActivity" android:exported="false" />

@@ -55,19 +55,13 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.2");
+            tvVersion.setText("v2.3");
         }
 
-        // Sıralı giriş animasyonları (stagger)
-        android.view.animation.Animation cardAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.card_stagger);
-        android.view.animation.Animation cardAnim2 = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.card_stagger);
-        android.view.animation.Animation fadeIn = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.fade_in_scale);
-        cardAnim2.setStartOffset(80);
-        fadeIn.setStartOffset(160);
-        cardOverlay.startAnimation(cardAnim);
-        cardAccessibility.startAnimation(cardAnim2);
-        android.view.View btnCard = (android.view.View) btnStartOverlay.getParent();
-        if (btnCard != null) btnCard.startAnimation(fadeIn);
+        // Animasyonları azalt: Sadece basit bir alpha animasyonu ekle
+        // Büyük animasyonlar (stagger, fade_in_scale) performansı etkileyebilir
+        // cardOverlay.setAlpha(0f);
+        // cardOverlay.animate().alpha(1f).setDuration(300).start();
 
         // Overlay izni butonu
         cardOverlay.setOnClickListener(v -> requestOverlayPermission());
@@ -121,13 +115,6 @@ public class MainActivity extends AppCompatActivity {
         Button btnSettings = findViewById(R.id.btn_settings);
         btnSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
-        });
-
-        // Notlar Butonu
-        Button btnNotes = findViewById(R.id.btn_notes);
-        btnNotes.setOnClickListener(v -> {
-            startActivity(new Intent(this, NoteActivity.class));
             overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
         });
     }
