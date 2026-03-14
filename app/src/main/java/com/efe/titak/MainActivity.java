@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.1");
+            tvVersion.setText("v2.2");
         }
 
         // Sıralı giriş animasyonları (stagger)
@@ -121,6 +121,13 @@ public class MainActivity extends AppCompatActivity {
         Button btnSettings = findViewById(R.id.btn_settings);
         btnSettings.setOnClickListener(v -> {
             startActivity(new Intent(this, SettingsActivity.class));
+            overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
+        });
+
+        // Notlar Butonu
+        Button btnNotes = findViewById(R.id.btn_notes);
+        btnNotes.setOnClickListener(v -> {
+            startActivity(new Intent(this, NoteActivity.class));
             overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
         });
     }
