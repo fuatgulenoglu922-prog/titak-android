@@ -249,33 +249,30 @@ public class MainActivity extends AppCompatActivity {
     private boolean isAccessibilityEnabled() {
         try {
             android.view.accessibility.AccessibilityManager am = (android.view.accessibility.AccessibilityManager) getSystemService(ACCESSIBILITY_SERVICE);
-            if (am == null) return false;
-            
-            // Use AccessibilityManager to get enabled services (more reliable on Android 14+)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                java.util.List<android.accessibilityservice.AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-                String serviceName = BotAccessibilityService.class.getName();
-                for (android.accessibilityservice.AccessibilityServiceInfo service : enabledServices) {
-                    if (service.getId().contains(serviceName)) {
-                        return true;
-                    }
-                }
+            if (am == null) {
+                BotEngine.get().log("⚠️ AccessibilityManager is null");
                 return false;
-            } else {
-                // Fallback for older versions
-                String service = getPackageName() + "/" + BotAccessibilityService.class.getCanonicalName();
-                int enabled = Settings.Secure.getInt(
-                    getContentResolver(),
-                    Settings.Secure.ACCESSIBILITY_ENABLED, 0
-                );
-                if (enabled != 1) return false;
-                String settingValue = Settings.Secure.getString(
-                    getContentResolver(),
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-                );
-                return settingValue != null && settingValue.contains(service);
             }
+            
+            // Use Settings.Secure for all Android versions (more reliable)
+            String service = getPackageName() + "/" + BotAccessibilityService.class.getCanonicalName();
+            int enabled = Settings.Secure.getInt(
+                getContentResolver(),
+                Settings.Secure.ACCESSIBILITY_ENABLED, 0
+            );
+            if (enabled != 1) {
+                BotEngine.get().log("⚠️ Accessibility service not enabled in settings");
+                return false;
+            }
+            String settingValue = Settings.Secure.getString(
+                getContentResolver(),
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+            );
+            boolean isEnabled = settingValue != null && settingValue.contains(service);
+            BotEngine.get().log("Accessibility check: service=" + service + ", enabled=" + isEnabled);
+            return isEnabled;
         } catch (Exception e) {
+            BotEngine.get().log("⚠️ isAccessibilityEnabled error: " + e.getMessage());
             return false;
         }
     }
