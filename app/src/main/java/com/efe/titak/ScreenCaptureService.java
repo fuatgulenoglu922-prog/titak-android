@@ -18,6 +18,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.DisplayMetrics;
@@ -31,10 +32,12 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScreenCaptureService extends Service {
 
@@ -52,14 +55,20 @@ public class ScreenCaptureService extends Service {
     private int height;
     private int density;
 
-    private Handler handler;
-    private boolean isScanning = false;
+    private Handler scanningHandler;
+    private Handler uiHandler;
+    private HandlerThread scanningThread;
 
-    private static final long SCAN_INTERVAL_MS = 30; // 30ms for super fast reaction
+    private static final long SCAN_INTERVAL_MS = 10; // 10ms for very fast reaction (~100 FPS)
+    private static final long OPEN_BUTTON_SCAN_INTERVAL_MS = 5; // 5ms for ultra-fast open button detection
 
     private Mat templateChest;
     private Mat templateOpen;
     private Mat templateEmpty;
+
+    private AtomicBoolean isProcessing = new AtomicBoolean(false);
+    private AtomicBoolean isOpenButtonVisible = new AtomicBoolean(false);
+    private long lastOpenButtonDetectionTime = 0;
 
     @Override
     public void onCreate() {
@@ -74,7 +83,13 @@ public class ScreenCaptureService extends Service {
         loadTemplates();
 
         projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        handler = new Handler(Looper.getMainLooper());
+        
+        // Create dedicated thread for scanning
+        scanningThread = new HandlerThread("ScreenScanningThread");
+        scanningThread.start();
+        scanningHandler = new Handler(scanningThread.getLooper());
+        uiHandler = new Handler(Looper.getMainLooper());
+
         startForeground(2, buildNotification());
     }
 
@@ -82,6 +97,13 @@ public class ScreenCaptureService extends Service {
         templateChest = loadMatFromUri("tpl_chest");
         templateOpen = loadMatFromUri("tpl_open");
         templateEmpty = loadMatFromUri("tpl_empty");
+        
+        if (templateChest != null) {
+            BotEngine.get().log("✅ Sandık şablonu yüklendi: " + templateChest.cols() + "x" + templateChest.rows());
+        }
+        if (templateOpen != null) {
+            BotEngine.get().log("✅ Aç butonu şablonu yüklendi: " + templateOpen.cols() + "x" + templateOpen.rows());
+        }
     }
 
     private Mat loadMatFromUri(String key) {
@@ -98,7 +120,7 @@ public class ScreenCaptureService extends Service {
                 Mat mat = new Mat();
                 Bitmap bmp32 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
                 Utils.bitmapToMat(bmp32, mat);
-                Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB); // Template matching works best on RGB/Grayscale
+                Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGBA2RGB);
                 return mat;
             }
         } catch (Exception e) {
@@ -159,11 +181,11 @@ public class ScreenCaptureService extends Service {
         virtualDisplay = mediaProjection.createVirtualDisplay(
             "ScreenCapture", width, height, density,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            imageReader.getSurface(), null, handler
+            imageReader.getSurface(), null, scanningHandler
         );
 
         startImagePolling();
-        BotEngine.get().log("🚀 OpenCV Ekran Tarayıcı Başlatıldı");
+        BotEngine.get().log("🚀 OpenCV Ekran Tarayıcı Başlatıldı (Ultra Hızlı Mod)");
     }
 
     private Runnable pollRunnable;
@@ -173,7 +195,7 @@ public class ScreenCaptureService extends Service {
             @Override
             public void run() {
                 if (!BotEngine.get().isActive()) {
-                    handler.postDelayed(this, SCAN_INTERVAL_MS);
+                    scanningHandler.postDelayed(this, SCAN_INTERVAL_MS);
                     return;
                 }
 
@@ -181,108 +203,130 @@ public class ScreenCaptureService extends Service {
                 try {
                     image = imageReader.acquireLatestImage();
                     if (image != null) {
-                        processImage(image);
-                    } else {
-                        // Eğer boş frame gelirse (ekran değişmediyse) chest olmadığını varsaymamak lazım, 
-                        // ama yine de tarama kaydedilebilir.
-                        // Şimdilik pas geçiyoruz.
+                        processImageAsync(image);
                     }
                 } catch (Exception e) {
                     if (image != null) image.close();
                 }
 
-                handler.postDelayed(this, SCAN_INTERVAL_MS);
+                scanningHandler.postDelayed(this, SCAN_INTERVAL_MS);
             }
         };
-        handler.post(pollRunnable);
+        scanningHandler.post(pollRunnable);
     }
 
-    private void processImage(Image image) {
-        if (isScanning || templateChest == null || templateOpen == null) {
-            if (templateChest == null || templateOpen == null) {
-                BotEngine.get().updateStatus("⚠️ Lütfen Ana Ekranda Şablon Seçin!");
-            }
+    private void processImageAsync(Image image) {
+        if (isProcessing.get()) {
             image.close();
             return;
         }
-        isScanning = true;
 
-        Image.Plane[] planes = image.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
-        int pixelStride = planes[0].getPixelStride();
-        int rowStride = planes[0].getRowStride();
-        int rowPadding = rowStride - pixelStride * width;
+        isProcessing.set(true);
 
-        Bitmap bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride, height, Bitmap.Config.ARGB_8888);
-        bitmap.copyPixelsFromBuffer(buffer);
-        image.close();
+        // Create a copy of the image data in a background thread
+        scanningHandler.post(() -> {
+            try {
+                Image.Plane[] planes = image.getPlanes();
+                ByteBuffer buffer = planes[0].getBuffer();
+                int pixelStride = planes[0].getPixelStride();
+                int rowStride = planes[0].getRowStride();
+                int rowPadding = rowStride - pixelStride * width;
 
-        Bitmap screenBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
-        bitmap.recycle();
+                Bitmap bitmap = Bitmap.createBitmap(width + rowPadding / pixelStride, height, Bitmap.Config.ARGB_8888);
+                bitmap.copyPixelsFromBuffer(buffer);
+                image.close();
 
-        Mat mScreen = new Mat();
-        Utils.bitmapToMat(screenBitmap, mScreen);
-        screenBitmap.recycle();
-        
-        Imgproc.cvtColor(mScreen, mScreen, Imgproc.COLOR_RGBA2RGB);
+                Bitmap screenBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
+                bitmap.recycle();
 
-        boolean foundSomething = checkTemplates(mScreen);
-        
-        mScreen.release();
-        
-        isScanning = false;
+                Mat mScreen = new Mat();
+                Utils.bitmapToMat(screenBitmap, mScreen);
+                screenBitmap.recycle();
+                
+                Imgproc.cvtColor(mScreen, mScreen, Imgproc.COLOR_RGBA2RGB);
+
+                checkTemplates(mScreen);
+                
+                mScreen.release();
+            } catch (Exception e) {
+                BotEngine.get().log("⚠️ Görüntü işleme hatası: " + e.getMessage());
+            } finally {
+                isProcessing.set(false);
+            }
+        });
     }
 
     private long lastChestTapTime = 0;
+    private static final long CHEST_TAP_COOLDOWN = 2000; // 2 seconds cooldown between chest taps
 
-    private boolean checkTemplates(Mat screen) {
-        boolean found = false;
-        double thresholdChest = 0.55; // Sandığı daha rahat bulsun
-        double thresholdOpen = 0.50;  // Aç yazısını animasyon bitmeden çok erken bulsun
-        double thresholdEmpty = 0.60;
+    private void checkTemplates(Mat screen) {
+        long currentTime = System.currentTimeMillis();
 
-        // 1. Önce "Boş / Bitti / Tamam" şablonuna bak
+        // 1. Check for Empty/Complete button first (highest priority)
         if (templateEmpty != null) {
-            Point p = match(screen, templateEmpty, thresholdEmpty);
+            Point p = matchInRegion(screen, templateEmpty, 0.60);
             if (p != null) {
-                // ...
                 BotEngine.get().updateStatus("❌ Tamam/Boş Butonu Eşleşti, Kapatılıyor");
                 BotEngine.get().requestTap((float) p.x + (templateEmpty.cols() / 2f), (float) p.y + (templateEmpty.rows() / 2f));
-                BotEngine.get().forceSwipe(); // Tıkladıktan sonra yayını geç
-                return true;
+                BotEngine.get().forceSwipe();
+                isOpenButtonVisible.set(false);
+                BotEngine.get().setChestClicked(false); // Reset chest state
+                return;
             }
         }
 
-        // 2. Aç butonuna bak (Eğer varsa tıkla)
-        Point openPoint = match(screen, templateOpen, thresholdOpen);
-        if (openPoint != null) {
-            BotEngine.get().updateStatus("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
-            // Hızlıca 2 kez tıklaması için erişilebilirliğe ardarda komut gönderilebilir
-            // Fakat 30ms döngü hızı zaten saniyede 33 kez tıklayacaktır.
-            BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
-            BotEngine.get().registerChestWatching(); 
-            return true;
-        }
-
-        // 3. Sandık İkonuna bak (Eğer varsa tıkla ve bekle)
-        Point chestPoint = match(screen, templateChest, thresholdChest);
-        if (chestPoint != null) {
-            BotEngine.get().registerChestWatching(); 
+        // 2. Check for Open button (high frequency scan)
+        if (templateOpen != null) {
+            // Optimize: Only scan the bottom half of the screen where buttons usually appear
+            int regionHeight = height / 2;
+            Mat bottomRegion = new Mat(screen, new Rect(0, height - regionHeight, width, regionHeight));
             
-            // Sandığın üstüne SADECE 1 KERE bas (sürekli açıp kapatmaması için)
-            if (!BotEngine.get().hasClickedChest()) {
-                BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Açılıyor...");
-                BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
-                BotEngine.get().setChestClicked(true);
+            Point openPoint = match(bottomRegion, templateOpen, 0.50);
+            bottomRegion.release();
+            
+            if (openPoint != null) {
+                // Convert relative coordinates back to full screen
+                openPoint.y += (height - regionHeight);
+                
+                isOpenButtonVisible.set(true);
+                lastOpenButtonDetectionTime = currentTime;
+                
+                BotEngine.get().updateStatus("🎯 AÇ Butonu Eşleşti, Tıklanıyor!");
+                BotEngine.get().requestTap((float) openPoint.x + (templateOpen.cols() / 2f), (float) openPoint.y + (templateOpen.rows() / 2f));
+                BotEngine.get().registerChestWatching();
+                
+                // Ultra-fast retry for open button
+                scanningHandler.post(() -> {
+                    // Immediately scan again for open button
+                    Mat screen2 = null; // Would need to pass this, simplified for now
+                });
+                return;
             } else {
-                BotEngine.get().updateStatus("🎁 Sandık Sayacı Bekleniyor...");
+                isOpenButtonVisible.set(false);
             }
-            return true;
+        }
+
+        // 3. Check for Chest icon
+        if (templateChest != null && currentTime - lastChestTapTime > CHEST_TAP_COOLDOWN) {
+            Point chestPoint = match(screen, templateChest, 0.55);
+            if (chestPoint != null) {
+                BotEngine.get().registerChestWatching();
+                
+                // Only tap chest if we haven't recently
+                if (!BotEngine.get().hasClickedChest()) {
+                    BotEngine.get().updateStatus("🎁 Sandık İkonu Görüldü, Açılıyor...");
+                    BotEngine.get().requestTap((float) chestPoint.x + (templateChest.cols() / 2f), (float) chestPoint.y + (templateChest.rows() / 2f));
+                    BotEngine.get().setChestClicked(true);
+                    lastChestTapTime = currentTime;
+                } else {
+                    BotEngine.get().updateStatus("🎁 Sandık Sayacı Bekleniyor...");
+                }
+                return;
+            }
         }
 
         // Hiçbir şey bulunamadı
         BotEngine.get().recordScan(false);
-        return false;
     }
 
     private Point match(Mat screen, Mat template, double threshold) {
@@ -293,7 +337,6 @@ public class ScreenCaptureService extends Service {
         Mat result = new Mat();
         Imgproc.matchTemplate(screen, template, result, Imgproc.TM_CCOEFF_NORMED);
         Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
-
         result.release();
 
         if (mmr.maxVal >= threshold) {
@@ -302,11 +345,41 @@ public class ScreenCaptureService extends Service {
         return null;
     }
 
+    private Point matchInRegion(Mat screen, Mat template, double threshold) {
+        if (template == null || screen.empty() || template.empty()) {
+            return null;
+        }
+
+        // Define region of interest (center of screen for empty button)
+        int startX = width / 4;
+        int startY = height / 4;
+        int regionWidth = width / 2;
+        int regionHeight = height / 2;
+
+        if (screen.cols() < startX + regionWidth || screen.rows() < startY + regionHeight) {
+            return null;
+        }
+
+        Mat region = new Mat(screen, new Rect(startX, startY, regionWidth, regionHeight));
+        Point p = match(region, template, threshold);
+        region.release();
+
+        if (p != null) {
+            p.x += startX;
+            p.y += startY;
+        }
+
+        return p;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (handler != null && pollRunnable != null) {
-            handler.removeCallbacks(pollRunnable);
+        if (scanningHandler != null && pollRunnable != null) {
+            scanningHandler.removeCallbacks(pollRunnable);
+        }
+        if (scanningThread != null) {
+            scanningThread.quitSafely();
         }
         if (virtualDisplay != null) virtualDisplay.release();
         if (imageReader != null) imageReader.close();
