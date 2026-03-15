@@ -37,15 +37,16 @@ jobs:
 
       - name: Generate debug.keystore
         run: |
-          keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkey -v -keystore app/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Get version from build.gradle
         id: version
         run: |
-          V=$(grep versionName app/build.gradle | head -1 | sed 's/.*"\([^"]*\)".*/\1/')
+          V=$(grep versionName app/build.gradle | head -1 | sed 's/.*"\([^"]*\)".*/\1/' | tr -d ' ')
+          if [ -z "$V" ]; then V="2.8"; fi
           echo "VERSION=$V" >> $GITHUB_ENV
           echo "version=$V" >> $GITHUB_OUTPUT
 
