@@ -42,7 +42,6 @@
     <color name="text_neon">@color/accent_green</color>
     <color name="card_warn">#3F1E1E</color>
     <color name="card_ok">#1E3F2E</color>
-    <color name="text_primary">@color/text_high</color>
     <color name="text_secondary">@color/text_mid</color>
     <color name="text_dim">@color/text_low</color>
 </resources>

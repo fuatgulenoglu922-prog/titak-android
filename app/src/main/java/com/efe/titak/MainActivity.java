@@ -253,9 +253,9 @@ public class MainActivity extends AppCompatActivity {
             
             // Use AccessibilityManager to get enabled services (more reliable on Android 14+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                java.util.List<android.view.accessibility.AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(android.view.accessibility.AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
+                java.util.List<android.accessibilityservice.AccessibilityServiceInfo> enabledServices = am.getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
                 String serviceName = BotAccessibilityService.class.getName();
-                for (android.view.accessibility.AccessibilityServiceInfo service : enabledServices) {
+                for (android.accessibilityservice.AccessibilityServiceInfo service : enabledServices) {
                     if (service.getId().contains(serviceName)) {
                         return true;
                     }
