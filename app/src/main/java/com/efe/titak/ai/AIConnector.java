@@ -109,7 +109,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
         is.close();
 
         if (code != 200) {
@@ -173,7 +173,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
         is.close();
 
         if (code != 200) throw new RuntimeException("Anthropic: " + response);
@@ -193,9 +193,9 @@ public class AIConnector {
         String urlStr = base + "v1beta/models/" + model + ":generateContent?key=" + apiKey.getApiKey();
 
         JSONObject body = new JSONObject();
-        JSONArray contents = new JSONArray();
-        JSONObject content = new JSONObject();
-        JSONArray parts = new JSONArray();
+        JSONArray contentsArray = new JSONArray();
+        JSONObject contentObject = new JSONObject();
+        JSONArray inputParts = new JSONArray();
 
         StringBuilder fullPrompt = new StringBuilder();
         if (history != null) {
@@ -205,12 +205,12 @@ public class AIConnector {
         }
         fullPrompt.append("Kullanıcı: ").append(userMessage).append("\nAsistan: ");
 
-        JSONObject part = new JSONObject();
-        part.put("text", fullPrompt.toString());
-        parts.put(part);
-        content.put("parts", parts);
-        contents.put(content);
-        body.put("contents", contents);
+        JSONObject promptPart = new JSONObject();
+        promptPart.put("text", fullPrompt.toString());
+        inputParts.put(promptPart);
+        contentObject.put("parts", inputParts);
+        contentsArray.put(contentObject);
+        body.put("contents", contentsArray);
         body.put("generationConfig", new JSONObject()
                 .put("maxOutputTokens", 1024)
                 .put("temperature", 0.7f));
@@ -229,7 +229,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
         is.close();
 
         if (code != 200) throw new RuntimeException("Google: " + response);
@@ -237,9 +237,9 @@ public class AIConnector {
         JSONObject json = new JSONObject(response);
         JSONArray candidates = json.optJSONArray("candidates");
         if (candidates != null && candidates.length() > 0) {
-            JSONArray parts = candidates.getJSONObject(0).optJSONObject("content").optJSONArray("parts");
-            if (parts != null && parts.length() > 0) {
-                return parts.getJSONObject(0).optString("text", "").trim();
+            JSONArray outputParts = candidates.getJSONObject(0).optJSONObject("content").optJSONArray("parts");
+            if (outputParts != null && outputParts.length() > 0) {
+                return outputParts.getJSONObject(0).optString("text", "").trim();
             }
         }
         return "";
