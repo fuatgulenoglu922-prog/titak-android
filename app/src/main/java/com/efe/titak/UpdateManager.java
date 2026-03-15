@@ -22,7 +22,7 @@ public class UpdateManager {
 
     // GitHub repo — kendi reponuza göre değiştirin (örn: "kullanici/titak-android")
     private static final String GITHUB_REPO = "fuatgulenoglu922-prog/titak-android";
-    private static final String VERSION_URL = "https://raw.githubusercontent.com/" + GITHUB_REPO + "/main/version.txt";
+    private static final String VERSION_URL = "https://raw.githubusercontent.com/" + GITHUB_REPO + "/e282c4994778054462a2a3444583e4e8f8937d32/version.txt";
     private static final String APK_URL_LATEST = "https://github.com/" + GITHUB_REPO + "/releases/download/latest/app-debug.apk";
     private static final String USER_AGENT = "TiTak-Android-Updater/1.0";
 
