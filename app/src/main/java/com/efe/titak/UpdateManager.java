@@ -1,5 +1,6 @@
 package com.efe.titak;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,9 @@ import android.os.Build;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,42 +24,55 @@ public class UpdateManager {
 
     private final Context context;
 
-    // GitHub repo — kendi reponuza göre değiştirin (örn: "kullanici/titak-android")
+    // GitHub repo — kendi reponuza göre değiştirin
     private static final String GITHUB_REPO = "fuatgulenoglu922-prog/titak-android";
-    private static final String VERSION_URL = "https://raw.githubusercontent.com/" + GITHUB_REPO + "/main/version.txt";
-    private static final String APK_URL_LATEST = "https://github.com/" + GITHUB_REPO + "/releases/download/latest/app-debug.apk";
-    private static final String USER_AGENT = "TiTak-Android-Updater/1.0";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/" + GITHUB_REPO + "/releases/latest";
+    private static final String USER_AGENT = "TiTak-Android-Updater/2.8";
 
     public UpdateManager(Context context) {
         this.context = context;
     }
 
     public void checkAndInstallUpdate() {
-        new VersionCheckTask().execute(VERSION_URL);
+        new GitHubReleaseTask().execute(GITHUB_API_URL);
     }
 
-    private class VersionCheckTask extends AsyncTask<String, Void, String> {
+    private class GitHubReleaseTask extends AsyncTask<String, Void, JSONObject> {
+        private ProgressDialog progressDialog;
+
         @Override
-        protected String doInBackground(String... urls) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setTitle("Güncelleme Kontrolü");
+            progressDialog.setMessage("Son sürüm kontrol ediliyor...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... urls) {
             HttpURLConnection conn = null;
             try {
-                String urlStr = urls[0] + "?t=" + System.currentTimeMillis();
+                String urlStr = urls[0];
                 URL url = new URL(urlStr);
                 conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(8000);
-                conn.setReadTimeout(8000);
-                conn.setUseCaches(false);
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("User-Agent", USER_AGENT);
-                conn.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
-                conn.setRequestProperty("Pragma", "no-cache");
+                conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+                conn.setRequestProperty("Cache-Control", "no-cache");
+                
                 int code = conn.getResponseCode();
                 if (code != HttpURLConnection.HTTP_OK) return null;
+                
                 InputStream is = conn.getInputStream();
                 java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-                String v = s.hasNext() ? s.next().trim() : "";
+                String response = s.hasNext() ? s.next() : "";
                 is.close();
-                return v;
+                
+                return new JSONObject(response);
             } catch (Exception e) {
                 return null;
             } finally {
@@ -64,26 +81,63 @@ public class UpdateManager {
         }
 
         @Override
-        protected void onPostExecute(String remoteVersion) {
-            if (remoteVersion == null || remoteVersion.isEmpty()) {
-                Toast.makeText(context, "Bağlantı hatası. İnterneti kontrol edin veya daha sonra tekrar deneyin.", Toast.LENGTH_LONG).show();
+        protected void onPostExecute(JSONObject releaseInfo) {
+            progressDialog.dismiss();
+            
+            if (releaseInfo == null) {
+                Toast.makeText(context, "Bağlantı hatası. İnterneti kontrol edin.", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            remoteVersion = remoteVersion.trim();
-            String localVersion = "1.0";
             try {
-                localVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-            } catch (Exception ignored) {}
-            localVersion = localVersion != null ? localVersion.trim() : "1.0";
+                String tagName = releaseInfo.getString("tag_name");
+                String body = releaseInfo.optString("body", "");
+                JSONArray assets = releaseInfo.optJSONArray("assets");
+                
+                String downloadUrl = null;
+                if (assets != null) {
+                    for (int i = 0; i < assets.length(); i++) {
+                        JSONObject asset = assets.getJSONObject(i);
+                        String name = asset.optString("name", "");
+                        if (name.endsWith(".apk") && name.contains("debug")) {
+                            downloadUrl = asset.optString("browser_download_url");
+                            break;
+                        }
+                    }
+                }
+                
+                if (downloadUrl == null) {
+                    Toast.makeText(context, "APK dosyası bulunamadı.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            if (remoteVersion.equals(localVersion)) {
-                Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(context, "Yeni sürüm: v" + remoteVersion + " indiriliyor...", Toast.LENGTH_SHORT).show();
-                new DownloadTask().execute(APK_URL_LATEST);
+                String localVersion = "1.0";
+                try {
+                    localVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+                } catch (Exception ignored) {}
+
+                // tag_name "latest" ise sürüm karşılaştırması yapma, doğrudan indir
+                boolean isLatestTag = "latest".equalsIgnoreCase(tagName);
+                if (!isLatestTag && tagName.equals(localVersion)) {
+                    Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
+                } else {
+                    showChangelogDialog(isLatestTag ? localVersion + " → En son sürüm" : tagName, body, downloadUrl);
+                }
+            } catch (Exception e) {
+                Toast.makeText(context, "Güncelleme hatası: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void showChangelogDialog(String version, String changelog, final String downloadUrl) {
+        new AlertDialog.Builder(context)
+            .setTitle("Yeni Güncelleme: v" + version)
+            .setMessage(changelog.isEmpty() ? "Yeni sürüm hazır!" : changelog)
+            .setPositiveButton("İndir ve Kur", (d, w) -> {
+                new DownloadTask().execute(downloadUrl);
+            })
+            .setNegativeButton("İptal", null)
+            .show();
     }
 
     private class DownloadTask extends AsyncTask<String, Integer, File> {
@@ -109,31 +163,13 @@ public class UpdateManager {
             HttpURLConnection connection = null;
             try {
                 String urlStr = sUrl[0];
-                // GitHub 302 yönlendirmesini takip et (en fazla 5 redirect)
-                for (int redirect = 0; redirect < 5; redirect++) {
-                    URL url = new URL(urlStr);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(15000);
-                    connection.setReadTimeout(15000);
-                    connection.setRequestMethod("GET");
-                    connection.setRequestProperty("User-Agent", USER_AGENT);
-                    connection.setInstanceFollowRedirects(false);
-                    connection.connect();
-
-                    int code = connection.getResponseCode();
-                    if (code == HttpURLConnection.HTTP_OK) {
-                        break;
-                    }
-                    if (code == HttpURLConnection.HTTP_MOVED_TEMP || code == HttpURLConnection.HTTP_MOVED_PERM || code == 307) {
-                        String location = connection.getHeaderField("Location");
-                        connection.disconnect();
-                        connection = null;
-                        if (location == null || location.isEmpty()) return null;
-                        urlStr = location.startsWith("http") ? location : new URL(new URL(urlStr), location).toString();
-                        continue;
-                    }
-                    return null;
-                }
+                URL url = new URL(urlStr);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("User-Agent", USER_AGENT);
+                connection.connect();
 
                 int fileLength = connection.getContentLength();
                 input = connection.getInputStream();

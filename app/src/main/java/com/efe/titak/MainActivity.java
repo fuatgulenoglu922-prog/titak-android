@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.3");
+            tvVersion.setText("v2.8");
         }
 
         // Animasyonları azalt: Sadece basit bir alpha animasyonu ekle
@@ -117,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
         });
+
+        // Yapay Zeka API Butonu
+        Button btnApi = findViewById(R.id.btn_api);
+        btnApi.setOnClickListener(v -> startActivity(new Intent(this, APIActivity.class)));
 
         // Geri Bildirim Butonu
         Button btnFeedback = findViewById(R.id.btn_feedback);

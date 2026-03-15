@@ -282,8 +282,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_marginBottom="20dp">
+            android:weightSum="4"
+            android:layout_marginBottom="8dp">
 
             <Button
                 android:id="@+id/btn_update_app"
@@ -292,9 +292,21 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
                 android:text="Güncelle"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/status_info"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
+                android:id="@+id/btn_api"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="Yapay Zeka API"
+                android:textSize="11sp"
+                android:backgroundTint="@color/panel_cyber"
+                android:textColor="@color/neon_cyan"
                 style="@style/Widget.MaterialComponents.Button" />
 
             <Button
@@ -304,7 +316,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="4dp"
                 android:text="Ayarlar"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/text_high"
                 style="@style/Widget.MaterialComponents.Button" />
@@ -316,7 +328,7 @@
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:text="Geri Bildirim"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:backgroundTint="@color/panel_cyber"
                 android:textColor="@color/accent_green"
                 style="@style/Widget.MaterialComponents.Button" />

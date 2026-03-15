@@ -54,6 +54,7 @@
         <activity android:name=".NoteActivity" android:exported="false" />
         <activity android:name=".NoteEditorActivity" android:exported="false" />
         <activity android:name=".FeedbackActivity" android:exported="false" />
+        <activity android:name=".APIActivity" android:exported="false" />
 
         <!-- Kayan Widget Servisi (Overlay) -->
         <service
