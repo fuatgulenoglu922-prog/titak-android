@@ -67,7 +67,10 @@ public class UpdateManager {
                 
                 int code = conn.getResponseCode();
                 android.util.Log.d("UpdateManager", "Response code: " + code);
-                if (code != HttpURLConnection.HTTP_OK) return null;
+                if (code != HttpURLConnection.HTTP_OK) {
+                    android.util.Log.e("UpdateManager", "HTTP error code: " + code);
+                    return null;
+                }
                 
                 InputStream is = conn.getInputStream();
                 java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
@@ -89,7 +92,7 @@ public class UpdateManager {
             progressDialog.dismiss();
             
             if (releaseInfo == null) {
-                android.util.Log.e("UpdateManager", "releaseInfo is null");
+                android.util.Log.e("UpdateManager", "releaseInfo is null - API call failed");
                 Toast.makeText(context, "Bağlantı hatası. İnterneti kontrol edin.", Toast.LENGTH_LONG).show();
                 return;
             }
