@@ -10,7 +10,7 @@ android {
         applicationId "com.efe.titak"
         minSdk 24
         targetSdk 34
-        versionCode 21
+        versionCode 22
         versionName "2.8"
     }
 

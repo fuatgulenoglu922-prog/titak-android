@@ -15,12 +15,15 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // Müzik çalmaya başla
+        MusicManager.getInstance(this).playMusic();
+
         TextView tvVersion = findViewById(R.id.tv_version);
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             tvVersion.setText("v" + pInfo.versionName);
         } catch (Exception e) {
-            tvVersion.setText("v2.3");
+            tvVersion.setText("v2.8");
         }
 
         // Kullanıcıya özel mesaj

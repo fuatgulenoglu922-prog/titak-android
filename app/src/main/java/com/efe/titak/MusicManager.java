@@ -30,13 +30,15 @@ public class MusicManager {
                 if (mediaPlayer != null) {
                     mediaPlayer.setLooping(true);
                     mediaPlayer.setVolume(0.5f, 0.5f);
+                    // Kullanıcı isteği: İlk 23 saniyeyi atla
+                    mediaPlayer.seekTo(23000);
                 }
             }
             
             if (mediaPlayer != null && !isPlaying) {
                 mediaPlayer.start();
                 isPlaying = true;
-                Log.d(TAG, "Müzik başlatıldı");
+                Log.d(TAG, "Müzik başlatıldı (23s offset)");
             }
         } catch (Exception e) {
             Log.e(TAG, "Müzik çalma hatası: " + e.getMessage());
