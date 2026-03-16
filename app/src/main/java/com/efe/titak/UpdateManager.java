@@ -137,7 +137,7 @@ public class UpdateManager {
                 android.util.Log.d("UpdateManager", "normalizedTag: " + normalizedTag);
                 if (!isLatestTag && normalizedTag.equals(localVersion)) {
                     android.util.Log.d("UpdateManager", "Already up to date");
-                    Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Zaten güncel (v" + localVersion + " vs " + normalizedTag + ")", Toast.LENGTH_LONG).show();
                 } else {
                     android.util.Log.d("UpdateManager", "Showing update dialog");
                     showChangelogDialog(isLatestTag ? localVersion + " → En son sürüm" : tagName, body, downloadUrl);
