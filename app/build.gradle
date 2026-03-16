@@ -10,8 +10,8 @@ android {
         applicationId "com.efe.titak"
         minSdk 24
         targetSdk 34
-        versionCode 30
-        versionName "3.0.0"
+        versionCode 31
+        versionName "3.1.0"
     }
 
     signingConfigs {
@@ -46,4 +46,16 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     // OpenCV for Android
     implementation 'com.quickbirdstudios:opencv:4.5.3.0'
+
+    // Google Play Games Services
+    implementation 'com.google.android.gms:play-services-games-v2:19.0.0'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:32.7.2')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-messaging'
+
+    // VoIP (Using Agora for simplicity/reliability)
+    implementation 'io.agora.rtc:full-sdk:4.2.6'
 }

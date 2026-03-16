@@ -347,6 +347,41 @@
             style="@style/Widget.MaterialComponents.Button"
             android:layout_marginBottom="12dp" />
 
+        <!-- SOSYAL KONTROLLER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginBottom="12dp">
+
+            <Button
+                android:id="@+id/btn_profile"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:text="Profilim"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="#3D5AFE"
+                android:textColor="@color/white"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
+                android:id="@+id/btn_social_hub"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:text="Sosyal"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="#00E676"
+                android:textColor="@color/black"
+                style="@style/Widget.MaterialComponents.Button" />
+        </LinearLayout>
+
         <!-- Bilgi — kısa -->
         <TextView
             android:layout_width="match_parent"

@@ -145,6 +145,15 @@ public class MainActivity extends AppCompatActivity {
             musicManager.playMusic();
             updateMusicButton();
         }
+
+        // Sosyal Butonlar
+        findViewById(R.id.btn_profile).setOnClickListener(v -> {
+            startActivity(new Intent(this, ProfileActivity.class));
+        });
+
+        findViewById(R.id.btn_social_hub).setOnClickListener(v -> {
+            startActivity(new Intent(this, SocialActivity.class));
+        });
     }
 
     private void updateMusicButton() {

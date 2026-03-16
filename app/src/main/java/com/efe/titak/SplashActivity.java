@@ -8,6 +8,11 @@ import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.efe.titak.manager.SocialManager;
+import com.google.android.gms.games.GamesSignInClient;
+import com.google.android.gms.games.PlayGames;
+import com.google.android.gms.games.PlayGamesSdk;
+
 public class SplashActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
@@ -31,10 +36,35 @@ public class SplashActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // Play Games SDK'yı başlat
+        PlayGamesSdk.initialize(this);
+
+        // Play Games Giriş Kontrolü
+        checkPlayGamesSignIn();
+
         // 4 saniye sonra otomatik geçiş yap
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            proceedToNext();
+            // Proceed logic moved to sign-in completion
         }, 4000);
+    }
+
+    private void checkPlayGamesSignIn() {
+        GamesSignInClient signInClient = PlayGames.getGamesSignInClient(this);
+        signInClient.isAuthenticated().addOnCompleteListener(task -> {
+            boolean isAuthenticated = (task.isSuccessful() && task.getResult().isAuthenticated());
+            if (isAuthenticated) {
+                // Giriş yapılmış, SocialManager ile senkronize et
+                signInClient.requestServerSideAccess("", false).addOnCompleteListener(accessTask -> {
+                    // Normalde burada auth token alınıp Firebase'e gönderilir
+                    // Basitlik için sadece devam ediyoruz
+                    SocialManager.getInstance().syncUserProfile("GP_ID_LINKED", "Oyuncu", null);
+                    proceedToNext();
+                });
+            } else {
+                // Giriş yapılmamış, yine de devam et ama social kısıtlı kalacak
+                proceedToNext();
+            }
+        });
     }
 
     private void proceedToNext() {
