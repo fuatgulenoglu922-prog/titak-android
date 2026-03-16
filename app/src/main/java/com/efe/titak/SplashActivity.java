@@ -1,14 +1,16 @@
 package com.efe.titak;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TextView;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,29 +20,40 @@ public class SplashActivity extends AppCompatActivity {
         // Müzik çalmaya başla
         MusicManager.getInstance(this).playMusic();
 
-        TextView tvVersion = findViewById(R.id.tv_version);
+        // Kurt uluma sesini çal
         try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            tvVersion.setText("v" + pInfo.versionName);
+            int resId = getResources().getIdentifier("wolf_howl", "raw", getPackageName());
+            if (resId != 0) {
+                mediaPlayer = MediaPlayer.create(this, resId);
+                mediaPlayer.start();
+            }
         } catch (Exception e) {
-            tvVersion.setText("v2.8");
+            e.printStackTrace();
         }
 
-        // Kullanıcıya özel mesaj
-        TextView tvMessage = findViewById(R.id.tv_message);
-        tvMessage.setText("Uygulama Ali Sağlam tarafından yapılmıştır\nProfosyone kod ve metin yazarı");
+        // 4 saniye sonra otomatik geçiş yap
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            proceedToNext();
+        }, 4000);
+    }
 
-        // Buton tıklaması ile devam et
-        Button btnContinue = findViewById(R.id.btn_continue);
-        btnContinue.setOnClickListener(v -> {
-            // Şifre koruması kontrolü
-            boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
-            if (passEnabled) {
-                startActivity(new Intent(SplashActivity.this, LockActivity.class));
-            } else {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            }
-            finish();
-        });
+    private void proceedToNext() {
+        // Şifre koruması kontrolü
+        boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
+        if (passEnabled) {
+            startActivity(new Intent(SplashActivity.this, LockActivity.class));
+        } else {
+            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        }
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }
