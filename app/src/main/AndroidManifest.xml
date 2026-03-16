@@ -63,6 +63,7 @@
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".SocialActivity" android:exported="false" />
         <activity android:name=".CallActivity" android:exported="false" />
+        <activity android:name=".ChatActivity" android:exported="false" />
 
         <!-- Kayan Widget Servisi (Overlay) -->
         <service

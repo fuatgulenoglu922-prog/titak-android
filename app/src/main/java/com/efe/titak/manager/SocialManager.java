@@ -62,7 +62,34 @@ public class SocialManager {
     }
 
     public User getCurrentUser() {
+        if (currentUser == null && auth.getCurrentUser() != null) {
+            // Try to recover from recent auth but missing sync (edge case)
+            syncUserProfile("GP_RECOVERED", auth.getCurrentUser().getDisplayName(), null);
+        }
         return currentUser;
+    }
+
+    public void sendMessage(String targetUid, String text, SocialCallback callback) {
+        if (currentUser == null) {
+            callback.onError("Giriş yapılmamış");
+            return;
+        }
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("fromUid", currentUser.getUid());
+        message.put("text", text);
+        message.put("timestamp", System.currentTimeMillis());
+
+        // Save to a shared "chats" collection or subcollection
+        String chatId = getChatId(currentUser.getUid(), targetUid);
+        db.collection("chats").document(chatId).collection("messages")
+                .add(message)
+                .addOnSuccessListener(documentReference -> callback.onSuccess("Mesaj gönderildi"))
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    private String getChatId(String uid1, String uid2) {
+        return uid1.compareTo(uid2) < 0 ? uid1 + "_" + uid2 : uid2 + "_" + uid1;
     }
 
     public void sendFriendRequest(String targetTitakId, SocialCallback callback) {

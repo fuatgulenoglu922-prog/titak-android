@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.8");
+            tvVersion.setText("v3.1.1");
         }
 
         // Animasyonları azalt: Sadece basit bir alpha animasyonu ekle

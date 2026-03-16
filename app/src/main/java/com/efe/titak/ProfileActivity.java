@@ -23,7 +23,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         findViewById(R.id.btnSocial).setOnClickListener(v -> {
-            // Start SocialActivity
+            startActivity(new android.content.Intent(this, SocialActivity.class));
         });
     }
 }

@@ -1,6 +1,25 @@
 # TiTak Değişiklik Günlüğü
 
-## Versiyon 2.9.8 (16 Mart 2026)
+## Versiyon 3.1.1 (16 Mart 2026)
+
+### Hata Düzeltmeleri
+- 🛠️ **Profil Çökme Sorunu Giderildi**
+  - Google Services yapılandırması düzeltildi
+  - Profil sayfasındaki bağlantı hataları giderildi
+- ⚡ **Hızlandırma**
+  - Başlangıç (Splash) ekranı süresi 2 saniyeye indirildi
+
+### Yeni Özellikler
+- 💬 **Sohbet Sistemi (Beta)**
+  - Arkadaşlarınızla gerçek zamanlı mesajlaşma altyapısı
+  - Yeni Chat arayüzü
+- 👤 **Profil Geliştirmeleri**
+  - "Arkadaş ve Sosyal" butonu aktif edildi
+  - Google hesap bağlantısı görselleştirildi
+
+---
+
+## Versiyon 3.1.0 (16 Mart 2026)
 
 ### Yeni Özellikler
 - 🎵 **Müzik Sistemi Eklendi**

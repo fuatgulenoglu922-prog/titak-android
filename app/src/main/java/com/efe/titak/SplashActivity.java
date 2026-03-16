@@ -44,8 +44,10 @@ public class SplashActivity extends AppCompatActivity {
 
         // 4 saniye sonra otomatik geçiş yap
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Proceed logic moved to sign-in completion
-        }, 4000);
+            // Logic handled by checkPlayGamesSignIn potentially, 
+            // but we ensure it proceeds after 2s if authenticated or not.
+            if (!isFinishing()) proceedToNext();
+        }, 2000);
     }
 
     private void checkPlayGamesSignIn() {
