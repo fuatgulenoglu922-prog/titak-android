@@ -23,9 +23,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView iconOverlay, iconAccessibility;
     private TextView tvOverlayStatus, tvAccessibilityStatus;
     private TextView tvVersion;
+    private Button btnMusicToggle;
     
     private static final int REQUEST_MEDIA_PROJECTION = 1001;
     private MediaProjectionManager projectionManager;
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
         tvOverlayStatus    = findViewById(R.id.tv_overlay_status);
         tvAccessibilityStatus = findViewById(R.id.tv_accessibility_status);
         tvVersion          = findViewById(R.id.tv_version);
+        btnMusicToggle     = findViewById(R.id.btn_music_toggle);
         
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        musicManager = MusicManager.getInstance(this);
 
         // Şifre Koruması Kontrolü
         boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
@@ -127,6 +131,28 @@ public class MainActivity extends AppCompatActivity {
         btnFeedback.setOnClickListener(v -> {
             startActivity(new Intent(this, FeedbackActivity.class));
         });
+
+        // Müzik Kontrol Butonu
+        updateMusicButton();
+        btnMusicToggle.setOnClickListener(v -> {
+            musicManager.toggleMusic();
+            updateMusicButton();
+        });
+
+        // Müziği otomatik başlat
+        boolean autoPlayMusic = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("auto_play_music", true);
+        if (autoPlayMusic) {
+            musicManager.playMusic();
+            updateMusicButton();
+        }
+    }
+
+    private void updateMusicButton() {
+        if (musicManager.isPlaying()) {
+            btnMusicToggle.setText("🔊 Müzik: Açık");
+        } else {
+            btnMusicToggle.setText("🔇 Müzik: Kapalı");
+        }
     }
 
     private String currentImageKey;

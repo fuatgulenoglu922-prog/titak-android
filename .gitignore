@@ -23,3 +23,10 @@ app/build/intermediates/
 *.dex
 *.class
 *.so
+
+# JDK ve gereksiz dosyalar
+jdk-17.0.2/
+openjdk-17.zip
+logs.zip
+nul
+gradlew.bat

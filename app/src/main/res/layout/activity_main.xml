@@ -334,6 +334,19 @@
                 style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>
 
+        <!-- Müzik Kontrol Butonu -->
+        <Button
+            android:id="@+id/btn_music_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="🔊 Müzik: Açık"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/panel_cyber"
+            android:textColor="@color/neon_green"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_marginBottom="12dp" />
+
         <!-- Bilgi — kısa -->
         <TextView
             android:layout_width="match_parent"
