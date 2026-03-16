@@ -26,6 +26,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Set JAVA_HOME for all steps
+        run: echo "JAVA_HOME=${{ steps.setup-java.outputs.path }}" >> $GITHUB_ENV
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -35,46 +38,44 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+        run: chmod +x gradlew
 
-      # If gradlew is missing, this step will generate it
-      - name: Generate Gradle Wrapper if missing
+      - name: Verify debug.keystore
         run: |
-          if [ ! -f "gradlew" ]; then
-            gradle wrapper
-          fi
+          ls -la app/debug.keystore || (echo "HATA: app/debug.keystore bulunamadi"; exit 1)
 
       - name: Build Debug APK
-        env:
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Get version from build.gradle
+      - name: Get version
         id: version
         run: |
-          V=$(grep versionName app/build.gradle | head -1 | sed 's/.*"\([^"]*\)".*/\1/' | tr -d ' ')
-          if [ -z "$V" ]; then V="2.8"; fi
+          V=$(grep versionName app/build.gradle | head -1 | sed 's/.*"\([^"]*\)".*/\1/' | tr -d ' \n\r')
+          [ -z "$V" ] && V="2.8"
           echo "VERSION=$V" >> $GITHUB_ENV
           echo "version=$V" >> $GITHUB_OUTPUT
 
-      - name: Upload APK
+      - name: Verify APK
+        run: |
+          ls -la app/build/outputs/apk/debug/app-debug.apk || (echo "HATA: APK olusturulamadi"; exit 1)
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Create or Update Release (tag = version)
-        uses: softprops/action-gh-release@v2
+      - name: Create or Update Release (TiTak 2.8)
         if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           name: TiTak ${{ env.VERSION }}
           body: |
-            ## TiTak ${{ env.VERSION }}
-            - Yapay zeka API bağlayıcı (OpenAI, Anthropic, Google, uyumlu — otomatik tespit)
-            - Geri Bildirim ekranında gerçek AI sohbeti
-            - Güncelle: GitHub'dan anında güncelleme
+            TiTak ${{ env.VERSION }} - Yapay zeka API baglayici, AI sohbet, GitHub guncelleme
           files: app/build/outputs/apk/debug/app-debug.apk
+          fail_on_unmatched_files: false
           update: true
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
