@@ -109,7 +109,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
         is.close();
 
         if (code != 200) {
@@ -173,7 +173,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
         is.close();
 
         if (code != 200) throw new RuntimeException("Anthropic: " + response);
@@ -229,7 +229,7 @@ public class AIConnector {
         int code = conn.getResponseCode();
         InputStream is = code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream();
         if (is == null) throw new RuntimeException("HTTP " + code);
-        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\A").next();
+        String response = new Scanner(is, StandardCharsets.UTF_8.name()).useDelimiter("\\A").next();
         is.close();
 
         if (code != 200) throw new RuntimeException("Google: " + response);

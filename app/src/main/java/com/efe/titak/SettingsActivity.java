@@ -3,6 +3,7 @@ package com.efe.titak;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,11 @@ public class SettingsActivity extends AppCompatActivity {
         EditText etPassword = findViewById(R.id.et_new_password);
         Button btnSave = findViewById(R.id.btn_save_password);
         Button btnDisable = findViewById(R.id.btn_disable_password);
+        Switch swFaceUnlock = findViewById(R.id.sw_face_unlock);
+
+        // Yüz tanıma ayarını yükle
+        boolean faceEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("face_unlock_enabled", false);
+        swFaceUnlock.setChecked(faceEnabled);
 
         btnSave.setOnClickListener(v -> {
             String pass = etPassword.getText().toString().trim();
@@ -41,6 +47,14 @@ public class SettingsActivity extends AppCompatActivity {
             Toast.makeText(this, "Şifre koruması kaldırıldı.", Toast.LENGTH_SHORT).show();
             finish();
             overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
+        });
+
+        swFaceUnlock.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            getSharedPreferences("bot_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("face_unlock_enabled", isChecked)
+                    .apply();
+            Toast.makeText(this, isChecked ? "Yüz tanıma aktif edildi." : "Yüz tanıma devre dışı bırakıldı.", Toast.LENGTH_SHORT).show();
         });
     }
 }
