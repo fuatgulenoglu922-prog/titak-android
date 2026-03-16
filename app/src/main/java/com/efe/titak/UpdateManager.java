@@ -55,6 +55,7 @@ public class UpdateManager {
             HttpURLConnection conn = null;
             try {
                 String urlStr = urls[0];
+                android.util.Log.d("UpdateManager", "API URL: " + urlStr);
                 URL url = new URL(urlStr);
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
@@ -65,6 +66,7 @@ public class UpdateManager {
                 conn.setRequestProperty("Cache-Control", "no-cache");
                 
                 int code = conn.getResponseCode();
+                android.util.Log.d("UpdateManager", "Response code: " + code);
                 if (code != HttpURLConnection.HTTP_OK) return null;
                 
                 InputStream is = conn.getInputStream();
@@ -72,8 +74,10 @@ public class UpdateManager {
                 String response = s.hasNext() ? s.next() : "";
                 is.close();
                 
+                android.util.Log.d("UpdateManager", "Response: " + response);
                 return new JSONObject(response);
             } catch (Exception e) {
+                android.util.Log.e("UpdateManager", "Error: " + e.getMessage());
                 return null;
             } finally {
                 if (conn != null) conn.disconnect();
@@ -85,28 +89,34 @@ public class UpdateManager {
             progressDialog.dismiss();
             
             if (releaseInfo == null) {
+                android.util.Log.e("UpdateManager", "releaseInfo is null");
                 Toast.makeText(context, "Bağlantı hatası. İnterneti kontrol edin.", Toast.LENGTH_LONG).show();
                 return;
             }
 
             try {
                 String tagName = releaseInfo.getString("tag_name");
+                android.util.Log.d("UpdateManager", "tagName: " + tagName);
                 String body = releaseInfo.optString("body", "");
                 JSONArray assets = releaseInfo.optJSONArray("assets");
+                android.util.Log.d("UpdateManager", "assets count: " + (assets != null ? assets.length() : 0));
                 
                 String downloadUrl = null;
                 if (assets != null) {
                     for (int i = 0; i < assets.length(); i++) {
                         JSONObject asset = assets.getJSONObject(i);
                         String name = asset.optString("name", "");
+                        android.util.Log.d("UpdateManager", "Asset name: " + name);
                         if (name.endsWith(".apk") && name.contains("debug")) {
                             downloadUrl = asset.optString("browser_download_url");
+                            android.util.Log.d("UpdateManager", "Download URL: " + downloadUrl);
                             break;
                         }
                     }
                 }
                 
                 if (downloadUrl == null) {
+                    android.util.Log.e("UpdateManager", "Download URL is null");
                     Toast.makeText(context, "APK dosyası bulunamadı.", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -114,6 +124,7 @@ public class UpdateManager {
                 String localVersion = "1.0";
                 try {
                     localVersion = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+                    android.util.Log.d("UpdateManager", "localVersion: " + localVersion);
                 } catch (Exception ignored) {}
 
                 // tag_name "latest" ise sürüm karşılaştırması yapma, doğrudan indir
@@ -123,12 +134,16 @@ public class UpdateManager {
                 if (normalizedTag.startsWith("v") && normalizedTag.length() > 1) {
                     normalizedTag = normalizedTag.substring(1);
                 }
+                android.util.Log.d("UpdateManager", "normalizedTag: " + normalizedTag);
                 if (!isLatestTag && normalizedTag.equals(localVersion)) {
+                    android.util.Log.d("UpdateManager", "Already up to date");
                     Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
                 } else {
+                    android.util.Log.d("UpdateManager", "Showing update dialog");
                     showChangelogDialog(isLatestTag ? localVersion + " → En son sürüm" : tagName, body, downloadUrl);
                 }
             } catch (Exception e) {
+                android.util.Log.e("UpdateManager", "Exception: " + e.getMessage());
                 Toast.makeText(context, "Güncelleme hatası: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
