@@ -118,7 +118,12 @@ public class UpdateManager {
 
                 // tag_name "latest" ise sürüm karşılaştırması yapma, doğrudan indir
                 boolean isLatestTag = "latest".equalsIgnoreCase(tagName);
-                if (!isLatestTag && tagName.equals(localVersion)) {
+                // Normalize tag name (remove 'v' prefix if present)
+                String normalizedTag = tagName;
+                if (normalizedTag.startsWith("v") && normalizedTag.length() > 1) {
+                    normalizedTag = normalizedTag.substring(1);
+                }
+                if (!isLatestTag && normalizedTag.equals(localVersion)) {
                     Toast.makeText(context, "Zaten güncel (v" + localVersion + ")", Toast.LENGTH_LONG).show();
                 } else {
                     showChangelogDialog(isLatestTag ? localVersion + " → En son sürüm" : tagName, body, downloadUrl);
