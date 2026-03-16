@@ -26,26 +26,38 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Set JAVA_HOME for all steps
+      - name: Set JAVA_HOME
         run: echo "JAVA_HOME=${{ steps.setup-java.outputs.path }}" >> $GITHUB_ENV
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android platform and build-tools
+      - name: Install Android SDK packages
         run: |
           sdkmanager "platforms;android-34" "build-tools;34.0.0"
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
 
+      # Gradle SDK yolunu bu dosyadan okur - "SDK location not found" hatasini onler
+      - name: Create local.properties
+        run: |
+          SDK_PATH="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          echo "sdk.dir=$SDK_PATH" > local.properties
+          echo "sdk.dir=$SDK_PATH"
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Verify debug.keystore
+      - name: Verify environment
         run: |
-          ls -la app/debug.keystore || (echo "HATA: app/debug.keystore bulunamadi"; exit 1)
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          test -f app/debug.keystore && echo "debug.keystore OK" || (echo "HATA: app/debug.keystore yok"; exit 1)
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
 
       - name: Get version
         id: version
@@ -56,8 +68,7 @@ jobs:
           echo "version=$V" >> $GITHUB_OUTPUT
 
       - name: Verify APK
-        run: |
-          ls -la app/build/outputs/apk/debug/app-debug.apk || (echo "HATA: APK olusturulamadi"; exit 1)
+        run: test -f app/build/outputs/apk/debug/app-debug.apk || (echo "Build log:"; tail -200 build.log; exit 1)
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -65,14 +76,20 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Create or Update Release (TiTak 2.8)
-        if: github.ref == 'refs/heads/main'
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+
+      - name: Create or Update Release
+        if: success() && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           name: TiTak ${{ env.VERSION }}
-          body: |
-            TiTak ${{ env.VERSION }} - Yapay zeka API baglayici, AI sohbet, GitHub guncelleme
+          body: "TiTak ${{ env.VERSION }} - Yapay zeka API, AI sohbet, GitHub guncelleme"
           files: app/build/outputs/apk/debug/app-debug.apk
           fail_on_unmatched_files: false
           update: true
