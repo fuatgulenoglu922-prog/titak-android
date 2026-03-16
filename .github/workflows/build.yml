@@ -1,10 +1,9 @@
+# Android APK - Manuel SDK kurulumu (android-actions bagimliligi yok)
 name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -15,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        id: setup-java
+        id: java
         uses: actions/setup-java@v4
         with:
           java-version: '17'
@@ -27,72 +25,64 @@ jobs:
           cache: gradle
 
       - name: Set JAVA_HOME
-        run: echo "JAVA_HOME=${{ steps.setup-java.outputs.path }}" >> $GITHUB_ENV
+        run: echo "JAVA_HOME=${{ steps.java.outputs.path }}" >> $GITHUB_ENV
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
+      # Android SDK - tamamen manuel (android-actions yok)
+      - name: Setup Android SDK (manual)
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0"
-          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          export ANDROID_HOME="$RUNNER_WORKSPACE/android-sdk"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          mkdir -p "$ANDROID_HOME"
+          cd "$ANDROID_HOME"
+          wget -q "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -O cmdtools.zip
+          unzip -q cmdtools.zip
+          rm cmdtools.zip
+          if [ -f cmdline-tools/bin/sdkmanager ]; then
+            SDK_BIN="$ANDROID_HOME/cmdline-tools/bin"
+          else
+            SDK_BIN="$ANDROID_HOME/$(find cmdline-tools -name sdkmanager -type f | head -1 | xargs dirname)"
+          fi
+          echo "SDK_BIN=$SDK_BIN" >> $GITHUB_ENV
+          echo "$SDK_BIN" >> $GITHUB_PATH
 
-      # Gradle SDK yolunu bu dosyadan okur - "SDK location not found" hatasini onler
+      - name: Accept licenses and install SDK packages
+        run: |
+          yes | "$SDK_BIN/sdkmanager" --sdk_root="$ANDROID_HOME" --licenses || true
+          "$SDK_BIN/sdkmanager" --sdk_root="$ANDROID_HOME" "platforms;android-34" "build-tools;34.0.0"
+
       - name: Create local.properties
         run: |
-          SDK_PATH="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          echo "sdk.dir=$SDK_PATH" > local.properties
-          echo "sdk.dir=$SDK_PATH"
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          cat local.properties
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Verify environment
+      - name: Build
         run: |
-          echo "JAVA_HOME=$JAVA_HOME"
-          java -version
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          test -f app/debug.keystore && echo "debug.keystore OK" || (echo "HATA: app/debug.keystore yok"; exit 1)
-
-      - name: Build Debug APK
-        run: |
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
-          exit ${PIPESTATUS[0]}
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Get version
-        id: version
+        id: ver
         run: |
           V=$(grep versionName app/build.gradle | head -1 | sed 's/.*"\([^"]*\)".*/\1/' | tr -d ' \n\r')
           [ -z "$V" ] && V="2.8"
           echo "VERSION=$V" >> $GITHUB_ENV
           echo "version=$V" >> $GITHUB_OUTPUT
 
-      - name: Verify APK
-        run: test -f app/build/outputs/apk/debug/app-debug.apk || (echo "Build log:"; tail -200 build.log; exit 1)
-
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload build log on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
-
-      - name: Create or Update Release
+      - name: Create Release
         if: success() && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
           name: TiTak ${{ env.VERSION }}
-          body: "TiTak ${{ env.VERSION }} - Yapay zeka API, AI sohbet, GitHub guncelleme"
+          body: "TiTak ${{ env.VERSION }}"
           files: app/build/outputs/apk/debug/app-debug.apk
           fail_on_unmatched_files: false
           update: true
-          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
