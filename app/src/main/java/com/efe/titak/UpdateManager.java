@@ -34,6 +34,8 @@ public class UpdateManager {
     }
 
     public void checkAndInstallUpdate() {
+        android.util.Log.d("UpdateManager", "Checking updates from repo: " + GITHUB_REPO);
+        Toast.makeText(context, "Güncelleme kontrol ediliyor: " + GITHUB_REPO, Toast.LENGTH_SHORT).show();
         new GitHubReleaseTask().execute(GITHUB_API_URL);
     }
 
