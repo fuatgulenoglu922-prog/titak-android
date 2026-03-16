@@ -74,7 +74,7 @@ public class SocialManager {
                         User targetUser = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class);
                         if (targetUser != null) {
                             Map<String, Object> request = new HashMap<>();
-                            request.setLayout("fromUid", currentUser.getUid());
+                            request.put("fromUid", currentUser.getUid());
                             request.put("fromDisplayName", currentUser.getDisplayName());
                             request.put("status", "pending");
                             request.put("timestamp", System.currentTimeMillis());
