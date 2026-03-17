@@ -48,6 +48,13 @@ public class SocialManager {
         });
     }
 
+    public void setupLocalUser(String displayName) {
+        String mockUid = "LOCAL_" + Math.abs(displayName.hashCode());
+        String titakId = generateUniqueTitakId(displayName);
+        currentUser = new User(mockUid, "LOCAL_PLAY", titakId, displayName);
+        currentUser.setOnline(true);
+    }
+
     private void updateFcmToken(String token) {
         if (currentUser == null || token == null) return;
         Map<String, Object> data = new HashMap<>();

@@ -54,11 +54,30 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v3.4");
+            tvVersion.setText("v3.5");
         }
 
-        // Google Login Butonu
-        findViewById(R.id.btn_google_login).setOnClickListener(v -> signIn());
+        // Check if we need to show fallback login automatically
+        boolean isLocalUser = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
+        if (!isLocalUser && FirebaseAuth.getInstance().getCurrentUser() == null) {
+            // User hasn't set a local name and isn't typed to Firebase.
+            // Don't force automatically yet, but when they click Login, we catch error.
+        }
+
+        if (isLocalUser) {
+            String localName = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_display_name", "Misafir");
+            SocialManager.getInstance().setupLocalUser(localName);
+        }
+
+        // Google Login / Fallback Login Butonu
+        findViewById(R.id.btn_google_login).setOnClickListener(v -> {
+            boolean local = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
+            if(FirebaseAuth.getInstance().getCurrentUser() != null || local) {
+                 Toast.makeText(this, "Zaten giriş yapıldı.", Toast.LENGTH_SHORT).show();
+            } else {
+                 signIn();
+            }
+        });
 
         // Pro Özellikler Butonu
         findViewById(R.id.btn_pro_features).setOnClickListener(v -> showProPasswordDialog());
@@ -118,9 +137,42 @@ public class MainActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                Toast.makeText(this, "Giris Basarisiz: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                // If Google Login fails (like Error 10), use fallback system
+                Toast.makeText(this, "Google Girişi Başarısız. Yerel Giriş Açılıyor.", Toast.LENGTH_SHORT).show();
+                showFallbackLoginDialog();
             }
         }
+    }
+
+    private void showFallbackLoginDialog() {
+        EditText etUsername = new EditText(this);
+        etUsername.setHint("Kullanıcı Adı (Örn: Efe)");
+        etUsername.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+
+        new AlertDialog.Builder(this)
+            .setTitle("TiTak'a Hoş Geldin")
+            .setMessage("Google girişi yapılamadı. Lütfen uygulamayı kullanmak için bir İsim belirle.")
+            .setView(etUsername)
+            .setCancelable(false)
+            .setPositiveButton("Giriş Yap", (d, w) -> {
+                String username = etUsername.getText().toString().trim();
+                if (username.isEmpty()) {
+                    username = "Misafir";
+                }
+                
+                // Save locally
+                getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
+                    .putString("local_display_name", username)
+                    .putBoolean("is_local_user", true)
+                    .apply();
+
+                Toast.makeText(this, "Hoşgeldin, " + username + "!", Toast.LENGTH_SHORT).show();
+                
+                // Create minimal SocialManager setup for local user
+                SocialManager.getInstance().setupLocalUser(username);
+                recreate();
+            })
+            .show();
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
@@ -134,10 +186,16 @@ public class MainActivity extends AppCompatActivity {
                                 FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
                                 null
                         );
+                        // Save that we are not local
+                        getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
+                            .putBoolean("is_local_user", false)
+                            .apply();
+                            
                         Toast.makeText(this, "Giris Basarili!", Toast.LENGTH_SHORT).show();
                         recreate();
                     } else {
                         Toast.makeText(this, "Kimlik Dogrulama Hatasi.", Toast.LENGTH_SHORT).show();
+                        showFallbackLoginDialog();
                     }
                 });
     }
