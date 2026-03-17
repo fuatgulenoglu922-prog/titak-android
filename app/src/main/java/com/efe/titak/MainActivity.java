@@ -72,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Google Login / Fallback Login Butonu
         findViewById(R.id.btn_google_login).setOnClickListener(v -> {
-            boolean local = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
-            if(FirebaseAuth.getInstance().getCurrentUser() != null || local) {
+            if(FirebaseAuth.getInstance().getCurrentUser() != null) {
                  Toast.makeText(this, "Zaten giriş yapıldı.", Toast.LENGTH_SHORT).show();
             } else {
                  signIn();

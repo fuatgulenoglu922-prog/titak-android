@@ -55,6 +55,9 @@ public class SocialManager {
         }
         currentUser = new User(mockUid, "LOCAL_PLAY", titakId, displayName);
         currentUser.setOnline(true);
+        
+        // Save to Firestore so other users can see them and they can send/receive requests
+        db.collection("users").document(mockUid).set(currentUser);
     }
 
     private void updateFcmToken(String token) {
