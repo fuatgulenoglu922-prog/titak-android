@@ -46,7 +46,6 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     // OpenCV for Android
 
-
     // Google Play Games Services
     implementation 'com.google.android.gms:play-services-games-v2:19.0.0'
 

@@ -99,16 +99,16 @@ public class CallActivity extends AppCompatActivity {
         if (mRtcEngine == null) return;
 
         switch (effectIndex) {
-            case 1: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_OLDMAN); break;
-            case 2: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_CHILD); break;
-            case 3: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_PIG); break;
-            case 4: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_HULK); break;
-            case 5: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_CHIPMUNK); break;
-            case 6: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_BEE); break;
-            case 7: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_UNPROCESSED); break; // Placeholder for Deep
-            case 8: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_ELECTRONIC); break;
-            case 9: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_ETHEREAL); break;
-            case 10: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_POPULAR); break;
+            case 1: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_OLDMAN); break;
+            case 2: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_BOY); break;
+            case 3: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_PIGKING); break;
+            case 4: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_HULK); break;
+            case 5: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_CHIPMUNK); break;
+            case 6: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_BEE); break;
+            case 7: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_SISTER); break; 
+            case 8: mRtcEngine.setAudioEffectPreset(Constants.STYLE_TRANSFORMATION_POPULAR); break;
+            case 9: mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_ETHEREAL); break;
+            case 10: mRtcEngine.setAudioEffectPreset(Constants.STYLE_TRANSFORMATION_RNB); break;
             default: mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF); break;
         }
     }
