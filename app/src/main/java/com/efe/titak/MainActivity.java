@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Yapay Zeka API Butonu
-        // findViewById(R.id.btn_api).setOnClickListener(v -> startActivity(new Intent(this, APIActivity.class)));
+
 
         // Geri Bildirim Butonu
         findViewById(R.id.btn_feedback).setOnClickListener(v -> {
