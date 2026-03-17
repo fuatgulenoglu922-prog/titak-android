@@ -48,8 +48,8 @@ public class SocialManager {
         });
     }
 
-    public void setupLocalUser(String displayName, String titakId) {
-        String mockUid = "LOCAL_" + Math.abs(displayName.hashCode());
+    public void setupLocalUser(String displayName, String titakId, String localUid) {
+        String mockUid = localUid != null ? localUid : "LOCAL_" + Math.abs(displayName.hashCode());
         if (titakId == null) {
             titakId = generateUniqueTitakId(displayName);
         }
@@ -130,6 +130,42 @@ public class SocialManager {
                         callback.onError("Kullanıcı bulunamadı");
                     }
                 });
+    }
+
+    public void acceptFriendRequest(String requesterUid, String requesterName, SocialCallback callback) {
+        if (currentUser == null) return;
+        
+        // Add to friends collection for current user
+        Map<String, Object> friendData1 = new HashMap<>();
+        friendData1.put("uid", requesterUid);
+        friendData1.put("displayName", requesterName);
+        friendData1.put("timestamp", System.currentTimeMillis());
+        
+        db.collection("users").document(currentUser.getUid())
+            .collection("friends").document(requesterUid).set(friendData1);
+            
+        // Add to friends collection for requester
+        Map<String, Object> friendData2 = new HashMap<>();
+        friendData2.put("uid", currentUser.getUid());
+        friendData2.put("displayName", currentUser.getDisplayName());
+        friendData2.put("timestamp", System.currentTimeMillis());
+        
+        db.collection("users").document(requesterUid)
+            .collection("friends").document(currentUser.getUid()).set(friendData2);
+            
+        // Remove request
+        db.collection("users").document(currentUser.getUid())
+            .collection("friendRequests").document(requesterUid).delete()
+            .addOnSuccessListener(aVoid -> callback.onSuccess("İstek kabul edildi"))
+            .addOnFailureListener(e -> callback.onError(e.getMessage()));
+    }
+
+    public void rejectFriendRequest(String requesterUid, SocialCallback callback) {
+        if (currentUser == null) return;
+        db.collection("users").document(currentUser.getUid())
+            .collection("friendRequests").document(requesterUid).delete()
+            .addOnSuccessListener(aVoid -> callback.onSuccess("İstek reddedildi"))
+            .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
     public interface SocialCallback {

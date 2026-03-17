@@ -36,7 +36,9 @@ public class ChatActivity extends AppCompatActivity {
         rvMessages = findViewById(R.id.rvMessages);
         rvMessages.setLayoutManager(new LinearLayoutManager(this));
 
-        findViewById(R.id.btnSend).setOnClickListener(v -> {
+        android.widget.ImageView btnSend = findViewById(R.id.btnSend);
+
+        btnSend.setOnClickListener(v -> {
             String text = etMessage.getText().toString().trim();
             if (!text.isEmpty()) {
                 SocialManager.getInstance().sendMessage(targetUid, text, new SocialManager.SocialCallback() {

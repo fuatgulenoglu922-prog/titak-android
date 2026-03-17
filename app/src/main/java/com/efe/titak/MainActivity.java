@@ -16,6 +16,12 @@ import android.media.projection.MediaProjectionManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import java.util.concurrent.TimeUnit;
+import com.efe.titak.worker.UpdateCheckWorker;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -54,8 +60,17 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v3.5");
+            tvVersion.setText("v3.8");
         }
+
+        // Setup background update checker
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        PeriodicWorkRequest updateWork = new PeriodicWorkRequest.Builder(UpdateCheckWorker.class, 12, TimeUnit.HOURS)
+                .setConstraints(constraints)
+                .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
 
         // Check if we need to show fallback login automatically
         boolean isLocalUser = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
@@ -67,7 +82,8 @@ public class MainActivity extends AppCompatActivity {
         if (isLocalUser) {
             String localName = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_display_name", "Misafir");
             String localId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
-            SocialManager.getInstance().setupLocalUser(localName, localId);
+            String localUid = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_uid", "LOCAL_" + Math.abs(localName.hashCode()));
+            SocialManager.getInstance().setupLocalUser(localName, localId, localUid);
         }
 
         // Google Login / Fallback Login Butonu
@@ -170,6 +186,10 @@ public class MainActivity extends AppCompatActivity {
                     newTitakId = String.valueOf(new java.util.Random().nextInt(9000) + 1000);
                 }
                 String email = account != null ? account.getEmail() : "";
+                String localUid = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_uid", null);
+                if (localUid == null) {
+                    localUid = "LOCAL_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+                }
                 
                 // Save locally
                 getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
@@ -177,12 +197,13 @@ public class MainActivity extends AppCompatActivity {
                     .putBoolean("is_local_user", true)
                     .putString("local_titak_id", newTitakId)
                     .putString("local_email", email)
+                    .putString("local_uid", localUid)
                     .apply();
 
                 Toast.makeText(this, "Hoşgeldin, " + username + "!", Toast.LENGTH_SHORT).show();
                 
                 // Create minimal SocialManager setup for local user
-                SocialManager.getInstance().setupLocalUser(username, newTitakId);
+                SocialManager.getInstance().setupLocalUser(username, newTitakId, localUid);
                 recreate();
             })
             .show();

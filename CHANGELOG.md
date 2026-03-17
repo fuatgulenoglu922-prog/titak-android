@@ -1,5 +1,25 @@
 # TiTak Değişiklik Günlüğü
 
+## Versiyon 3.8 (17 Mart 2026)
+
+### Yeni Özellikler
+- 🔔 **Otomatik Güncelleme Bildirimleri**
+  - Uygulama arka planda GitHub'a her 12 saatte bir bakar
+  - Yeni versiyon çıktığında telefonunuza bildirim gelir
+- 💬 **Geliştirilmiş Sohbet Arayüzü**
+  - Discord tarzı koyu tema (mavi-gri tonlar)
+  - Şık mesaj kutusu ve gönder butonu
+- 👥 **Arkadaş İstekleri**
+  - Gelen arkadaşlık istekleri otomatik algılanır
+  - İstek kabul edilince ortak arkadaş listesi oluşturulur
+
+### Hata Düzeltmeleri
+- 🛠️ **Kullanıcı ID'si Artık Değişmiyor**
+  - Uygulamayı kapatıp açınca ID sabit kalıyor
+  - Yerel kullanıcı kayıt sistemi düzeltildi
+
+---
+
 ## Versiyon 3.1.1 (16 Mart 2026)
 
 ### Hata Düzeltmeleri
