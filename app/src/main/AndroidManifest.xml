@@ -59,7 +59,6 @@
         <activity android:name=".NoteActivity" android:exported="false" />
         <activity android:name=".NoteEditorActivity" android:exported="false" />
         <activity android:name=".FeedbackActivity" android:exported="false" />
-        <activity android:name=".APIActivity" android:exported="false" />
         <activity android:name=".ProfileActivity" android:exported="false" />
         <activity android:name=".SocialActivity" android:exported="false" />
         <activity android:name=".CallActivity" android:exported="false" />
