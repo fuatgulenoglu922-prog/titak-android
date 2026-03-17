@@ -14,6 +14,7 @@ import io.agora.rtc2.Constants;
 import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
+import io.agora.rtc2.ChannelMediaOptions;
 
 public class CallActivity extends AppCompatActivity {
 
@@ -87,7 +88,10 @@ public class CallActivity extends AppCompatActivity {
         // Ses Değiştirici Uygula
         applyVoiceEffect();
         
-        mRtcEngine.joinChannel(token, channelName, "", 0);
+        ChannelMediaOptions options = new ChannelMediaOptions();
+        options.autoSubscribeAudio = true;
+        options.publishMicrophoneTrack = true;
+        mRtcEngine.joinChannel(token, channelName, 0, options);
     }
 
     private void applyVoiceEffect() {
