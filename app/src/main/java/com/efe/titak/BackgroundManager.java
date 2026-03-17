@@ -1,18 +1,17 @@
 package com.efe.titak;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,13 +19,16 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BackgroundManager {
     private static final String PREFS_NAME = "background_prefs";
     private static final String KEY_BACKGROUND_PATH = "background_path";
-    private static final String KEY_USE_ONLINE = "use_online_bg";
 
     private final Context context;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public BackgroundManager(Context context) {
         this.context = context;
@@ -39,7 +41,53 @@ public class BackgroundManager {
     }
 
     public void downloadRandomFromInternet(Activity activity, int requestCode) {
-        new DownloadRandomImageTask(activity, requestCode).execute();
+        ProgressDialog progressDialog = new ProgressDialog(activity);
+        progressDialog.setTitle("Resim İndiriliyor");
+        progressDialog.setMessage("Rastgele arka plan indiriliyor...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        executor.execute(() -> {
+            Bitmap bitmap = null;
+            try {
+                Random random = new Random();
+                int width = 1080 + random.nextInt(500);
+                int height = 1920 + random.nextInt(500);
+                int seed = random.nextInt(1000);
+
+                String urlStr = "https://picsum.photos/seed/" + seed + "/" + width + "/" + height;
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(15000);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    InputStream input = conn.getInputStream();
+                    bitmap = BitmapFactory.decodeStream(input);
+                    input.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            final Bitmap finalBitmap = bitmap;
+            mainHandler.post(() -> {
+                progressDialog.dismiss();
+                if (finalBitmap != null) {
+                    String path = saveBitmapToInternalStorage(finalBitmap);
+                    if (path != null) {
+                        saveBackgroundPath(path);
+                        applyBackground(activity);
+                        Toast.makeText(context, "Rastgele arka plan ayarlandı!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(context, "Resim indirilemedi. İnternet bağlantınızı kontrol edin.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     public void setBackgroundFromUri(Activity activity, Uri imageUri) {
@@ -126,70 +174,5 @@ public class BackgroundManager {
     public String getBackgroundPath() {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .getString(KEY_BACKGROUND_PATH, null);
-    }
-
-    private class DownloadRandomImageTask extends AsyncTask<Void, Void, Bitmap> {
-        private final Activity activity;
-        private final int requestCode;
-        private android.app.ProgressDialog progressDialog;
-
-        public DownloadRandomImageTask(Activity activity, int requestCode) {
-            this.activity = activity;
-            this.requestCode = requestCode;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new android.app.ProgressDialog(activity);
-            progressDialog.setTitle("Resim İndiriliyor");
-            progressDialog.setMessage("Rastgele arka plan indiriliyor...");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... voids) {
-            try {
-                Random random = new Random();
-                int width = 1080 + random.nextInt(500);
-                int height = 1920 + random.nextInt(500);
-                int seed = random.nextInt(1000);
-
-                String urlStr = "https://picsum.photos/seed/" + seed + "/" + width + "/" + height;
-                URL url = new URL(urlStr);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(15000);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-
-                int responseCode = conn.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    InputStream input = conn.getInputStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(input);
-                    input.close();
-                    return bitmap;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            progressDialog.dismiss();
-            if (bitmap != null) {
-                String path = saveBitmapToInternalStorage(bitmap);
-                if (path != null) {
-                    saveBackgroundPath(path);
-                    applyBackground(activity);
-                    Toast.makeText(context, "Rastgele arka plan ayarlandı!", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(context, "Resim indirilemedi. İnternet bağlantınızı kontrol edin.", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 }
