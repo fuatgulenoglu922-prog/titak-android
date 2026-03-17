@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v3.3");
+            tvVersion.setText("v3.4");
         }
 
         // Google Login Butonu
