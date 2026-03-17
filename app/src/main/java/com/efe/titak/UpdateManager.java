@@ -24,7 +24,7 @@ public class UpdateManager {
 
     private final Context context;
 
-    // GitHub repo — kendi reponuza göre değiştirin
+    // GitHub repo - kendi reponuza gore degistirin
     private static final String GITHUB_REPO = "fuatgulenoglu922-prog/titak-android";
     private static final String GITHUB_API_URL = "https://api.github.com/repos/" + GITHUB_REPO + "/releases/latest";
     private static final String USER_AGENT = "TiTak-Android-Updater/2.8";
@@ -132,7 +132,7 @@ public class UpdateManager {
                     android.util.Log.d("UpdateManager", "localVersion: " + localVersion);
                 } catch (Exception ignored) {}
 
-                // tag_name "latest" ise sürüm karşılaştırması yapma, doğrudan indir
+                // tag_name "latest" ise surum karsilastirmasi yapma, dogrudan indir
                 boolean isLatestTag = "latest".equalsIgnoreCase(tagName);
                 // Normalize tag name (remove 'v' prefix if present)
                 String normalizedTag = tagName;
