@@ -46,6 +46,15 @@
                 android:textSize="14sp"
                 android:layout_marginTop="4dp"/>
 
+            <TextView
+                android:id="@+id/tvGoogleEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Google: Bağlı Değil"
+                android:textColor="#888888"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"/>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

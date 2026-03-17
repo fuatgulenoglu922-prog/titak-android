@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (isLocalUser) {
             String localName = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_display_name", "Misafir");
-            SocialManager.getInstance().setupLocalUser(localName);
+            String localId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
+            SocialManager.getInstance().setupLocalUser(localName, localId);
         }
 
         // Google Login / Fallback Login Butonu
@@ -135,19 +136,24 @@ public class MainActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account.getIdToken());
+                firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // If Google Login fails (like Error 10), use fallback system
                 Toast.makeText(this, "Google Girişi Başarısız. Yerel Giriş Açılıyor.", Toast.LENGTH_SHORT).show();
-                showFallbackLoginDialog();
+                showFallbackLoginDialog(null);
             }
         }
     }
 
-    private void showFallbackLoginDialog() {
+    private void showFallbackLoginDialog(GoogleSignInAccount account) {
         EditText etUsername = new EditText(this);
         etUsername.setHint("Kullanıcı Adı (Örn: Efe)");
         etUsername.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
+        
+        String defaultName = account != null && account.getDisplayName() != null ? account.getDisplayName() : "";
+        if (!defaultName.isEmpty()) {
+            etUsername.setText(defaultName);
+        }
 
         new AlertDialog.Builder(this)
             .setTitle("TiTak'a Hoş Geldin")
@@ -157,26 +163,34 @@ public class MainActivity extends AppCompatActivity {
             .setPositiveButton("Giriş Yap", (d, w) -> {
                 String username = etUsername.getText().toString().trim();
                 if (username.isEmpty()) {
-                    username = "Misafir";
+                    username = defaultName.isEmpty() ? "Misafir" : defaultName;
                 }
+                
+                String newTitakId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
+                if (newTitakId == null) {
+                    newTitakId = String.valueOf(new java.util.Random().nextInt(9000) + 1000);
+                }
+                String email = account != null ? account.getEmail() : "";
                 
                 // Save locally
                 getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
                     .putString("local_display_name", username)
                     .putBoolean("is_local_user", true)
+                    .putString("local_titak_id", newTitakId)
+                    .putString("local_email", email)
                     .apply();
 
                 Toast.makeText(this, "Hoşgeldin, " + username + "!", Toast.LENGTH_SHORT).show();
                 
                 // Create minimal SocialManager setup for local user
-                SocialManager.getInstance().setupLocalUser(username);
+                SocialManager.getInstance().setupLocalUser(username, newTitakId);
                 recreate();
             })
             .show();
     }
 
-    private void firebaseAuthWithGoogle(String idToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -195,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                         recreate();
                     } else {
                         Toast.makeText(this, "Kimlik Dogrulama Hatasi.", Toast.LENGTH_SHORT).show();
-                        showFallbackLoginDialog();
+                        showFallbackLoginDialog(account);
                     }
                 });
     }

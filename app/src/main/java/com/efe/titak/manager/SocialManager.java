@@ -48,9 +48,11 @@ public class SocialManager {
         });
     }
 
-    public void setupLocalUser(String displayName) {
+    public void setupLocalUser(String displayName, String titakId) {
         String mockUid = "LOCAL_" + Math.abs(displayName.hashCode());
-        String titakId = generateUniqueTitakId(displayName);
+        if (titakId == null) {
+            titakId = generateUniqueTitakId(displayName);
+        }
         currentUser = new User(mockUid, "LOCAL_PLAY", titakId, displayName);
         currentUser.setOnline(true);
     }

@@ -25,9 +25,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="3 haneli ID girin (örn: 123)"
+            android:hint="4 haneli ID girin (örn: 1234)"
             android:inputType="number"
-            android:maxLength="3"
+            android:maxLength="4"
             android:textColor="@color/white"
             android:textColorHint="#888888"
             android:backgroundTint="@color/white"/>

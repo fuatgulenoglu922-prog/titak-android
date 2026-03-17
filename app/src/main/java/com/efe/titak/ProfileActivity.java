@@ -15,11 +15,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         TextView tvDisplayName = findViewById(R.id.tvDisplayName);
         TextView tvTitakId = findViewById(R.id.tvTitakId);
+        TextView tvGoogleEmail = findViewById(R.id.tvGoogleEmail);
 
         User currentUser = SocialManager.getInstance().getCurrentUser();
         if (currentUser != null) {
             tvDisplayName.setText(currentUser.getDisplayName());
             tvTitakId.setText("ID: " + currentUser.getTitakId());
+            
+            if (com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null) {
+                String email = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                if (email != null && !email.isEmpty()) tvGoogleEmail.setText("Google: " + email);
+            } else {
+                String localEmail = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_email", "");
+                if (localEmail != null && !localEmail.isEmpty()) tvGoogleEmail.setText("Google: " + localEmail);
+            }
             
             // Canlı güncelleme dinleyicisi (ID sonradan yüklenirse)
             com.google.firebase.firestore.FirebaseFirestore.getInstance()

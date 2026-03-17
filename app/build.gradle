@@ -10,8 +10,8 @@ android {
         applicationId "com.efe.titak"
         minSdk 24
         targetSdk 34
-        versionCode 36
-        versionName "3.5"
+        versionCode 37
+        versionName "3.6"
     }
 
     signingConfigs {
