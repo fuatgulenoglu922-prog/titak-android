@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TİKTOKEFE</string>
-    <string name="accessibility_label">TİKTOKEFE Bot</string>
-    <string name="accessibility_desc">TikTok canlı yayınlarında treasure chest sandıklarını otomatik olarak algılar ve tıklar.</string>
+    <string name="app_name">TiTak</string>
+    <string name="accessibility_label">TiTak Helper</string>
+    <string name="accessibility_desc">TiTak iletişim asistanı.</string>
 </resources>

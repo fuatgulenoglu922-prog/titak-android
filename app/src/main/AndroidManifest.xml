@@ -66,40 +66,6 @@
         <activity android:name=".ChatActivity" android:exported="false" />
         <activity android:name=".ProSettingsActivity" android:exported="false" />
 
-        <!-- Kayan Widget Servisi (Overlay) -->
-        <service
-            android:name=".OverlayService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Kayan bot kontrolcüsü" />
-        </service>
-
-        <service
-            android:name=".ScreenCaptureService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Ekran okuma servisi" />
-        </service>
-
-        <!-- TikTok Erişilebilirlik Servisi (Otomatik Tıklama) -->
-        <service
-            android:name=".BotAccessibilityService"
-            android:exported="true"
-            android:label="@string/accessibility_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_config" />
-        </service>
-
         <service
             android:name=".service.TitakFCMService"
             android:exported="false">
