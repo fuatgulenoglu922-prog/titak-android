@@ -63,7 +63,7 @@
                     android:id="@+id/tv_user_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Çevrimiçi"
+                    android:text="Cevrimici"
                     android:textColor="@color/accent_green"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -71,7 +71,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="İletişime Hazır"
+                    android:text="Iletisime Hazir"
                     android:textColor="@color/text_mid"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp" />
@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hızlı İşlemler"
+            android:text="Hizli Islemler"
             android:textColor="@color/text_mid"
             android:textSize="11sp"
             android:layout_marginBottom="12dp" />
@@ -99,7 +99,7 @@
                 android:id="@+id/btn_pro_features"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="PRO ÖZELLİKLER (SES DEĞİŞTİRİCİ)"
+                android:text="PRO OZELLIKLER (SES DEGISTIRICI)"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:background="@drawable/btn_neon_main"
@@ -218,7 +218,7 @@
             android:layout_height="wrap_content"
             android:padding="14dp"
             android:background="@drawable/bg_neon_card"
-            android:text="Titak v3.2 ile artık tamamen bir iletişim aracıdır. Diğer kullanıcılarla ID üzerinden iletişime geçebilirsiniz."
+            android:text="Titak v3.2 ile artik tamamen bir iletisim aracidir. Diger kullanıcılarla ID uzerinden iletisime gecebilirsiniz."
             android:textColor="@color/text_mid"
             android:textSize="11sp"
             android:lineSpacingExtra="2dp" />
