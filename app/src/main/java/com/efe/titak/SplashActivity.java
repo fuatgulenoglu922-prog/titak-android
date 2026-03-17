@@ -16,6 +16,7 @@ import com.google.android.gms.games.PlayGamesSdk;
 public class SplashActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
+    private BackgroundManager backgroundManager;
 
     private static final int PERMISSION_REQ_ID = 22;
     private static final String[] REQUIRED_PERMISSIONS;
@@ -39,6 +40,9 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        backgroundManager = new BackgroundManager(this);
+        backgroundManager.applyBackground(this);
 
         // Müzik çalmaya başla
         MusicManager.getInstance(this).playMusic();

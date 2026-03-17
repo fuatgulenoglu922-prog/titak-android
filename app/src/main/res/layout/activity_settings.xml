@@ -15,6 +15,58 @@
         android:textStyle="bold"
         android:layout_marginBottom="24dp" />
 
+    <!-- Arka Plan Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_neon_card"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Arka Plan"
+            android:textColor="@color/neon_cyan"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_pick_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="📷 Galeriden Seç"
+            android:backgroundTint="@color/neon_cyan"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            style="@style/Widget.MaterialComponents.Button" />
+
+        <Button
+            android:id="@+id/btn_random_internet"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="🌐 İnternetten Rastgele"
+            android:backgroundTint="@color/brand_blurple"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button" />
+
+        <Button
+            android:id="@+id/btn_clear_background"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="❌ Arka Planı Kaldır"
+            android:backgroundTint="@color/transparent"
+            android:textColor="@color/neon_rose"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+    </LinearLayout>
+
+    <!-- Şifre Koruması Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

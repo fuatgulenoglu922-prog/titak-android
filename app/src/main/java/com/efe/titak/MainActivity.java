@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvVersion;
     private Button btnMusicToggle;
     private MusicManager musicManager;
+    private BackgroundManager backgroundManager;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
 
@@ -44,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        backgroundManager = new BackgroundManager(this);
+        backgroundManager.applyBackground(this);
 
         tvVersion = findViewById(R.id.tv_version);
         btnMusicToggle = findViewById(R.id.btn_music_toggle);
