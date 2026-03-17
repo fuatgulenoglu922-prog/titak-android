@@ -20,11 +20,11 @@ public class LockActivity extends AppCompatActivity {
         EditText etInput = findViewById(R.id.et_lock_password);
         Button btnUnlock = findViewById(R.id.btn_unlock);
         
-        // Yüz tanıma butonu ve kamera görünümü artık kullanılmıyor, gizleyelim veya kaldıralım
-        View btnFaceUnlock = findViewById(R.id.btn_face_unlock);
-        if (btnFaceUnlock != null) btnFaceUnlock.setVisibility(View.GONE);
-        View cameraView = findViewById(R.id.camera_view);
-        if (cameraView != null) cameraView.setVisibility(View.GONE);
+        // Yüz tanıma butonu ve kamera görünümü artık kullanılmıyor
+        // View btnFaceUnlock = findViewById(R.id.btn_face_unlock);
+        // if (btnFaceUnlock != null) btnFaceUnlock.setVisibility(View.GONE);
+        // View cameraView = findViewById(R.id.camera_view);
+        // if (cameraView != null) cameraView.setVisibility(View.GONE);
 
         btnUnlock.setOnClickListener(v -> {
             String input = etInput.getText().toString().trim();

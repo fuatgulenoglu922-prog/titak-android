@@ -55,7 +55,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging'
 
     // VoIP (Using Agora for simplicity/reliability)
-    implementation 'io.agora.rtc2:full-sdk:4.2.6'
+    implementation 'io.agora.rtc:full-sdk:4.1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
