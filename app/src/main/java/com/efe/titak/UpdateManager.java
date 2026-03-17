@@ -35,7 +35,7 @@ public class UpdateManager {
 
     public void checkAndInstallUpdate() {
         android.util.Log.d("UpdateManager", "Checking updates from repo: " + GITHUB_REPO);
-        Toast.makeText(context, "Güncelleme kontrol ediliyor: " + GITHUB_REPO, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "Guncelleme kontrol ediliyor: " + GITHUB_REPO, Toast.LENGTH_LONG).show();
         new GitHubReleaseTask().execute(GITHUB_API_URL);
     }
 
@@ -46,8 +46,8 @@ public class UpdateManager {
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("Güncelleme Kontrolü");
-            progressDialog.setMessage("Son sürüm kontrol ediliyor...");
+            progressDialog.setTitle("Guncelleme Kontrolu");
+            progressDialog.setMessage("Son surum kontrol ediliyor...");
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
@@ -95,7 +95,7 @@ public class UpdateManager {
             
             if (releaseInfo == null) {
                 android.util.Log.e("UpdateManager", "releaseInfo is null - API call failed");
-                Toast.makeText(context, "Bağlantı hatası. İnterneti kontrol edin.", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Baglanti hatasi. Interneti kontrol edin.", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -142,10 +142,10 @@ public class UpdateManager {
                 android.util.Log.d("UpdateManager", "normalizedTag: " + normalizedTag);
                 if (!isLatestTag && normalizedTag.equals(localVersion)) {
                     android.util.Log.d("UpdateManager", "Already up to date");
-                    Toast.makeText(context, "Zaten güncel (v" + localVersion + " vs " + normalizedTag + ")", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Zaten guncel (v" + localVersion + " vs " + normalizedTag + ")", Toast.LENGTH_LONG).show();
                 } else {
                     android.util.Log.d("UpdateManager", "Showing update dialog");
-                    showChangelogDialog(isLatestTag ? localVersion + " → En son sürüm" : tagName, body, downloadUrl);
+                    showChangelogDialog(isLatestTag ? localVersion + " -> En son surum" : tagName, body, downloadUrl);
                 }
             } catch (Exception e) {
                 android.util.Log.e("UpdateManager", "Exception: " + e.getMessage());
@@ -156,9 +156,9 @@ public class UpdateManager {
 
     private void showChangelogDialog(String version, String changelog, final String downloadUrl) {
         new AlertDialog.Builder(context)
-            .setTitle("Yeni Güncelleme: v" + version)
-            .setMessage(changelog.isEmpty() ? "Yeni sürüm hazır!" : changelog)
-            .setPositiveButton("İndir ve Kur", (d, w) -> {
+            .setTitle("Yeni Guncelleme: v" + version)
+            .setMessage(changelog.isEmpty() ? "Yeni surum hazir!" : changelog)
+            .setPositiveButton("Indir ve Kur", (d, w) -> {
                 new DownloadTask().execute(downloadUrl);
             })
             .setNegativeButton("İptal", null)
@@ -172,8 +172,8 @@ public class UpdateManager {
         protected void onPreExecute() {
             super.onPreExecute();
             progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("Güncelleme İndiriliyor");
-            progressDialog.setMessage("Lütfen bekleyin...");
+            progressDialog.setTitle("Guncelleme Indiriliyor");
+            progressDialog.setMessage("Lutfen bekleyin...");
             progressDialog.setIndeterminate(false);
             progressDialog.setMax(100);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -254,7 +254,7 @@ public class UpdateManager {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(context, "Yükleme hatası: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Yukleme hatasi: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }

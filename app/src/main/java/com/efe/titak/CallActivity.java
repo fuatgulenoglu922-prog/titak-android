@@ -33,13 +33,13 @@ public class CallActivity extends AppCompatActivity {
     private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
         @Override
         public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
-            runOnUiThread(() -> tvCallStatus.setText("Bağlandı"));
+            runOnUiThread(() -> tvCallStatus.setText("Baglandi"));
         }
 
         @Override
         public void onUserOffline(int uid, int reason) {
             runOnUiThread(() -> {
-                tvCallStatus.setText("Kullanıcı ayrıldı");
+                tvCallStatus.setText("Kullanici ayrildi");
                 finish();
             });
         }
@@ -117,7 +117,7 @@ public class CallActivity extends AppCompatActivity {
     public void onMuteClicked(View view) {
         isMuted = !isMuted;
         mRtcEngine.muteLocalAudioStream(isMuted);
-        Toast.makeText(this, isMuted ? "Sessize alındı" : "Ses açıldı", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, isMuted ? "Sessize alindi" : "Ses acildi", Toast.LENGTH_SHORT).show();
     }
 
     private void leaveChannel() {

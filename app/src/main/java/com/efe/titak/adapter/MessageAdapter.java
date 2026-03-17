@@ -36,7 +36,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         Message message = messageList.get(position);
         holder.tvMessage.setText(message.getText());
         
-        // Robot mesajı (bot) vs kullanıcı mesajı
+        // Robot mesaji (bot) vs kullanici mesaji
         if (message.isFromBot()) {
             holder.tvMessage.setBackgroundResource(R.drawable.bg_bot_message);
             holder.tvMessage.setTextColor(context.getResources().getColor(R.color.text_high));

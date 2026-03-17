@@ -169,7 +169,7 @@
             android:id="@+id/btn_music_toggle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="🔊 Müzik: Açık"
+            android:text=" Muzik: Acik"
             android:textSize="13sp"
             android:textStyle="bold"
             android:backgroundTint="@color/panel_cyber"
