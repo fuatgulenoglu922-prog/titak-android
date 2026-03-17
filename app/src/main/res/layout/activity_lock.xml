@@ -60,29 +60,4 @@
         android:textColor="@color/black"
         style="@style/Widget.MaterialComponents.Button" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Veya"
-        android:textColor="@color/text_mid"
-        android:textSize="11sp"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp" />
-
-    <Button
-        android:id="@+id/btn_face_unlock"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:text="Yüz Tanıma ile Aç"
-        android:textStyle="bold"
-        android:backgroundTint="@color/neon_cyan"
-        android:textColor="@color/black"
-        style="@style/Widget.MaterialComponents.Button" />
-
-    <org.opencv.android.JavaCameraView
-        android:id="@+id/camera_view"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone" />
 </LinearLayout>
