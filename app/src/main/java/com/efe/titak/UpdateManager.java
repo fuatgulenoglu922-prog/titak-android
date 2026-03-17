@@ -122,7 +122,7 @@ public class UpdateManager {
                 
                 if (downloadUrl == null) {
                     android.util.Log.e("UpdateManager", "Download URL is null");
-                    Toast.makeText(context, "APK dosyası bulunamadı.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "APK dosyasi bulunamadi.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -149,7 +149,7 @@ public class UpdateManager {
                 }
             } catch (Exception e) {
                 android.util.Log.e("UpdateManager", "Exception: " + e.getMessage());
-                Toast.makeText(context, "Güncelleme hatası: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Guncelleme hatasi: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -161,7 +161,7 @@ public class UpdateManager {
             .setPositiveButton("Indir ve Kur", (d, w) -> {
                 new DownloadTask().execute(downloadUrl);
             })
-            .setNegativeButton("İptal", null)
+            .setNegativeButton("Iptal", null)
             .show();
     }
 
@@ -235,7 +235,7 @@ public class UpdateManager {
             if (file != null) {
                 installApk(file);
             } else {
-                Toast.makeText(context, "İndirme hatası!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Indirme hatasi!", Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -21,7 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
         btnSave.setOnClickListener(v -> {
             String pass = etPassword.getText().toString().trim();
             if (pass.isEmpty()) {
-                Toast.makeText(this, "Şifre boş olamaz!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sifre bos olamaz!", Toast.LENGTH_SHORT).show();
                 return;
             }
             getSharedPreferences("bot_prefs", MODE_PRIVATE)
@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
                     .putString("app_password", pass)
                     .putBoolean("password_enabled", true)
                     .apply();
-            Toast.makeText(this, "Şifre kaydedildi ve aktif edildi.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sifre kaydedildi ve aktif edildi.", Toast.LENGTH_SHORT).show();
             finish();
             overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
         });
@@ -39,7 +39,7 @@ public class SettingsActivity extends AppCompatActivity {
                     .edit()
                     .putBoolean("password_enabled", false)
                     .apply();
-            Toast.makeText(this, "Şifre koruması kaldırıldı.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sifre korumasi kaldirildi.", Toast.LENGTH_SHORT).show();
             finish();
             overridePendingTransition(R.anim.theme_enter_reverse, R.anim.theme_exit_reverse);
         });
