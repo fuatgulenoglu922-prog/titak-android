@@ -56,8 +56,8 @@ public class SocialManager {
     }
 
     private String generateUniqueTitakId(String displayName) {
-        // 3 haneli özel ID sistemi (100-999 arası)
-        int randomNum = new Random().nextInt(900) + 100;
+        // 4 haneli özel ID sistemi (1000-9999 arası) için daha geniş aralık
+        int randomNum = new Random().nextInt(9000) + 1000;
         return String.valueOf(randomNum);
     }
 

@@ -20,6 +20,20 @@ public class ProfileActivity extends AppCompatActivity {
         if (currentUser != null) {
             tvDisplayName.setText(currentUser.getDisplayName());
             tvTitakId.setText("ID: " + currentUser.getTitakId());
+            
+            // Canlı güncelleme dinleyicisi (ID sonradan yüklenirse)
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(currentUser.getUid())
+                .addSnapshotListener((value, error) -> {
+                    if (value != null && value.exists()) {
+                        User updatedUser = value.toObject(User.class);
+                        if (updatedUser != null) {
+                            tvDisplayName.setText(updatedUser.getDisplayName());
+                            tvTitakId.setText("ID: " + updatedUser.getTitakId());
+                        }
+                    }
+                });
         }
 
         findViewById(R.id.btnSocial).setOnClickListener(v -> {

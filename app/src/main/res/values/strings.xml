@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">TiTak</string>
     <string name="accessibility_desc">TiTak Otomasyon Servisi</string>
+    <string name="default_web_client_id">00000000-placeholder.apps.googleusercontent.com</string>
 </resources>

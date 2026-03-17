@@ -39,7 +39,17 @@
                 android:background="@drawable/bg_neon_card"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp" />
+
+            <ImageView
+                android:id="@+id/btn_google_login"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_coin"
+                android:background="@drawable/bg_neon_card"
+                android:padding="6dp"
+                app:tint="@color/neon_cyan" />
         </LinearLayout>
 
         <!-- Iletisim Durumu -->
