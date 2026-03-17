@@ -1,73 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Minimalist Professional Palette -->
-    <!-- Primary Colors -->
-    <color name="primary_blue">#1E3A8A</color>
-    <color name="primary_light">#3B82F6</color>
-    <color name="primary_dark">#1E293B</color>
-    
-    <!-- Accent Colors -->
-    <color name="accent_green">#10B981</color>
-    <color name="accent_red">#EF4444</color>
-    <color name="accent_yellow">#F59E0B</color>
+    <!-- Discord Inspired Palette -->
+    <!-- Brand / Accent Colors -->
+    <color name="brand_blurple">#5865F2</color>
+    <color name="brand_green">#57F287</color>
+    <color name="brand_red">#ED4245</color>
+    <color name="brand_yellow">#FEE75C</color>
+    <color name="brand_fuchsia">#EB459E</color>
 
-    <!-- Neutral Backgrounds -->
-    <color name="bg_dark">#0F172A</color>
-    <color name="bg_card">#1E293B</color>
-    <color name="bg_panel">#334155</color>
-    
+    <!-- Dark Backgrounds -->
+    <color name="bg_dark_primary">#36393F</color>   <!-- Main chat/content area -->
+    <color name="bg_dark_secondary">#2F3136</color> <!-- Cards, embeds, sidebars -->
+    <color name="bg_dark_tertiary">#202225</color>  <!-- Status bar, title bar -->
+    <color name="bg_dark_floating">#18191C</color>  <!-- Popouts, tooltips -->
+    <color name="bg_dark_hover">#4F545C</color>     <!-- Hover states -->
+
+    <!-- Texts -->
+    <color name="text_bright">#FFFFFF</color>
+    <color name="text_normal">#DCDDDE</color>
+    <color name="text_muted">#8E9297</color>
+    <color name="text_dark">#72767D</color>
+
     <!-- Status Colors -->
-    <color name="status_ok">#10B981</color>
-    <color name="status_warn">#EF4444</color>
-    <color name="status_info">#3B82F6</color>
+    <color name="status_online">#3BA55C</color>
+    <color name="status_idle">#FAA61A</color>
+    <color name="status_dnd">#ED4245</color>
 
-    <!-- Text Palette -->
-    <color name="text_high">#FFFFFF</color>
-    <color name="text_primary">#E2E8F0</color>
-    <color name="text_mid">#94A3B8</color>
-    <color name="text_low">#64748B</color>
+    <!-- Aliases to preserve compatibility during transition -->
+    <color name="primary_blue">@color/brand_blurple</color>
+    <color name="primary_light">#7289da</color>
+    <color name="primary_dark">@color/bg_dark_tertiary</color>
+    
+    <color name="accent_green">@color/brand_green</color>
+    <color name="accent_red">@color/brand_red</color>
+    <color name="accent_yellow">@color/brand_yellow</color>
 
-    <!-- Material Design 3 Colors (Dark Theme) -->
-    <color name="md3_primary">#D0BCFF</color>
-    <color name="md3_on_primary">#381E72</color>
-    <color name="md3_primary_container">#4F378B</color>
-    <color name="md3_on_primary_container">#EADDFF</color>
-    <color name="md3_secondary">#CCC2DC</color>
-    <color name="md3_on_secondary">#332D41</color>
-    <color name="md3_secondary_container">#4A4458</color>
-    <color name="md3_on_secondary_container">#E8DEF8</color>
-    <color name="md3_tertiary">#EFB8C8</color>
-    <color name="md3_on_tertiary">#492532</color>
-    <color name="md3_tertiary_container">#633B48</color>
-    <color name="md3_on_tertiary_container">#FFD8E4</color>
-    <color name="md3_surface">#1C1B1F</color>
-    <color name="md3_on_surface">#E6E1E5</color>
-    <color name="md3_surface_variant">#49454F</color>
-    <color name="md3_on_surface_variant">#CAC4D0</color>
-    <color name="md3_outline">#938F99</color>
-    <color name="md3_outline_variant">#49454F</color>
-    <color name="md3_background">#1C1B1F</color>
-    <color name="md3_on_background">#E6E1E5</color>
-    <color name="md3_error">#F2B8B5</color>
-    <color name="md3_on_error">#601410</color>
-    <color name="md3_error_container">#8C1D18</color>
-    <color name="md3_on_error_container">#F9DEDC</color>
+    <color name="bg_dark">@color/bg_dark_primary</color>
+    <color name="bg_card">@color/bg_dark_secondary</color>
+    <color name="bg_panel">@color/bg_dark_secondary</color>
+    
+    <color name="status_ok">@color/status_online</color>
+    <color name="status_warn">@color/brand_red</color>
+    <color name="status_info">@color/brand_blurple</color>
+
+    <color name="text_high">@color/text_bright</color>
+    <color name="text_primary">@color/text_normal</color>
+    <color name="text_mid">@color/text_muted</color>
+    <color name="text_low">@color/text_dark</color>
+
+    <color name="neon_green">@color/brand_green</color>
+    <color name="neon_rose">@color/brand_red</color>
+    <color name="neon_cyan">@color/brand_blurple</color>
+    <color name="bg_cyber">@color/bg_dark_primary</color>
+    <color name="card_cyber">@color/bg_dark_secondary</color>
+    <color name="panel_cyber">@color/bg_dark_secondary</color>
+    <color name="text_neon">@color/text_bright</color>
+    <color name="card_warn">#4A2323</color>
+    <color name="card_ok">#234A2F</color>
+    <color name="text_secondary">@color/text_muted</color>
+    <color name="text_dim">@color/text_dark</color>
+
+    <!-- Material Design 3 overrides for seamless integration -->
+    <color name="md3_background">@color/bg_dark_primary</color>
+    <color name="md3_surface">@color/bg_dark_secondary</color>
+    <color name="md3_on_surface">@color/text_normal</color>
+    <color name="md3_primary">@color/brand_blurple</color>
+    <color name="md3_on_primary">@color/text_bright</color>
 
     <!-- Utility -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>
-
-    <!-- Aliases for compatibility -->
-    <color name="neon_green">@color/accent_green</color>
-    <color name="neon_rose">@color/accent_red</color>
-    <color name="neon_cyan">@color/status_info</color>
-    <color name="bg_cyber">@color/bg_dark</color>
-    <color name="card_cyber">@color/bg_card</color>
-    <color name="panel_cyber">@color/bg_panel</color>
-    <color name="text_neon">@color/accent_green</color>
-    <color name="card_warn">#3F1E1E</color>
-    <color name="card_ok">#1E3F2E</color>
-    <color name="text_secondary">@color/text_mid</color>
-    <color name="text_dim">@color/text_low</color>
 </resources>
