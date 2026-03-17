@@ -45,12 +45,22 @@
             android:tint="@color/white"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_lock_silent_mode"
+            android:backgroundTint="#9E9E9E"
+            android:layout_marginHorizontal="16dp"
+            android:onClick="onMuteClicked"
+            android:tint="@color/white"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAccept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@android:drawable/ic_menu_call"
             android:backgroundTint="#4CAF50"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:tint="@color/white"/>
 
     </LinearLayout>

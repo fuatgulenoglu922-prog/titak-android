@@ -42,209 +42,51 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- İzin kartları — kompakt -->
-        <LinearLayout
+        <!-- İletişim Durumu -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/transparent">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_overlay"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/transparent">
+                android:background="@drawable/bg_neon_card"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:gravity="center">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_user_status"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_neon_card"
-                    android:gravity="center_vertical"
-                    android:padding="14dp">
+                    android:text="Çevrimiçi"
+                    android:textColor="@color/accent_green"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/icon_overlay"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_warning"
-                        android:tint="@color/neon_green"
-                        android:layout_marginEnd="12dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ekran üstü izni"
-                            android:textColor="@color/text_high"
-                            android:textStyle="bold"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tv_overlay_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="❌ İzin gerekli"
-                            android:textColor="@color/accent_red"
-                            android:textSize="10sp"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_accessibility"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/transparent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_neon_card"
-                    android:gravity="center_vertical"
-                    android:padding="14dp">
+                    android:text="İletişime Hazır"
+                    android:textColor="@color/text_mid"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-                    <ImageView
-                        android:id="@+id/icon_accessibility"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_warning"
-                        android:tint="@color/neon_green"
-                        android:layout_marginEnd="12dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Erişilebilirlik servisi"
-                            android:textColor="@color/text_high"
-                            android:textStyle="bold"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/tv_accessibility_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="❌ Kapalı"
-                            android:textColor="@color/accent_red"
-                            android:textSize="10sp"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
-
-        <!-- Şablonlar — sade başlık -->
+        <!-- Hızlı İşlemler -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Şablon fotoğrafları"
+            android:text="Hızlı İşlemler"
             android:textColor="@color/text_mid"
             android:textSize="11sp"
             android:layout_marginBottom="12dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_marginBottom="24dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="6dp">
-
-                <ImageView
-                    android:id="@+id/img_tpl_chest"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/bg_neon_card"
-                    android:padding="4dp"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_camera" />
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="Sandık"
-                     android:gravity="center"
-                     android:textSize="10sp"
-                     android:textColor="@color/accent_green"
-                     android:layout_marginTop="6dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="6dp">
-
-                <ImageView
-                    android:id="@+id/img_tpl_open"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/bg_neon_card"
-                    android:padding="4dp"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_camera" />
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="Aç butonu"
-                     android:gravity="center"
-                     android:textSize="10sp"
-                     android:textColor="@color/accent_green"
-                     android:layout_marginTop="6dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="6dp">
-
-                <ImageView
-                    android:id="@+id/img_tpl_empty"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/bg_neon_card"
-                    android:padding="4dp"
-                    android:scaleType="centerCrop"
-                    android:src="@android:drawable/ic_menu_camera" />
-                 <TextView
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="Boş çıktı"
-                     android:gravity="center"
-                     android:textSize="10sp"
-                     android:textColor="@color/accent_green"
-                     android:layout_marginTop="6dp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Ana butonlar -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -254,29 +96,17 @@
             android:layout_marginBottom="12dp">
 
             <Button
-                android:id="@+id/btn_start_overlay"
+                android:id="@+id/btn_pro_features"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Botu başlat"
-                android:textSize="15sp"
+                android:text="PRO ÖZELLİKLER (SES DEĞİŞTİRİCİ)"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:background="@drawable/btn_neon_main"
                 android:textColor="@color/black"
                 android:stateListAnimator="@null"
                 style="@style/Widget.MaterialComponents.Button" />
         </androidx.cardview.widget.CardView>
-
-            <Button
-                android:id="@+id/btn_stop_bot"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Durdur"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:backgroundTint="@color/transparent"
-                android:textColor="@color/accent_red"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_marginBottom="12dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -388,7 +218,7 @@
             android:layout_height="wrap_content"
             android:padding="14dp"
             android:background="@drawable/bg_neon_card"
-            android:text="Botu başlattıktan sonra TikTok'u açın. Sandık görününce otomatik tıklar."
+            android:text="Titak v3.2 ile artık tamamen bir iletişim aracıdır. Diğer kullanıcılarla ID üzerinden iletişime geçebilirsiniz."
             android:textColor="@color/text_mid"
             android:textSize="11sp"
             android:lineSpacingExtra="2dp" />

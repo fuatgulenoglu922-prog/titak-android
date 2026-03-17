@@ -25,7 +25,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="ID girin (örn: oyuncu#1234)"
+            android:hint="3 haneli ID girin (örn: 123)"
+            android:inputType="number"
+            android:maxLength="3"
             android:textColor="@color/white"
             android:textColorHint="#888888"
             android:backgroundTint="@color/white"/>

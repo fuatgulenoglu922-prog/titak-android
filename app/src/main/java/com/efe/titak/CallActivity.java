@@ -83,7 +83,37 @@ public class CallActivity extends AppCompatActivity {
             return;
         }
         mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION);
+        
+        // Ses Değiştirici Uygula
+        applyVoiceEffect();
+        
         mRtcEngine.joinChannel(token, channelName, "", 0);
+    }
+
+    private void applyVoiceEffect() {
+        int effectIndex = getSharedPreferences("pro_prefs", MODE_PRIVATE).getInt("voice_effect", 0);
+        if (mRtcEngine == null) return;
+
+        switch (effectIndex) {
+            case 1: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_OLDMAN); break;
+            case 2: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_CHILD); break;
+            case 3: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_PIG); break;
+            case 4: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_HULK); break;
+            case 5: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_CHIPMUNK); break;
+            case 6: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_BEE); break;
+            case 7: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_UNPROCESSED); break; // Placeholder for Deep
+            case 8: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_ELECTRONIC); break;
+            case 9: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_ETHEREAL); break;
+            case 10: mRtcEngine.setAudioEffectPreset(Constants.VOICE_BEAUTIFIER_POPULAR); break;
+            default: mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF); break;
+        }
+    }
+
+    private boolean isMuted = false;
+    public void onMuteClicked(View view) {
+        isMuted = !isMuted;
+        mRtcEngine.muteLocalAudioStream(isMuted);
+        Toast.makeText(this, isMuted ? "Sessize alındı" : "Ses açıldı", Toast.LENGTH_SHORT).show();
     }
 
     private void leaveChannel() {

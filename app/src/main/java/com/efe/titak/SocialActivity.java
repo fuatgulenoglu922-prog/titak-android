@@ -24,6 +24,10 @@ public class SocialActivity extends AppCompatActivity {
 
         findViewById(R.id.btnSearch).setOnClickListener(v -> {
             String targetId = etSearchId.getText().toString().trim();
+            if (targetId.length() != 3) {
+                Toast.makeText(SocialActivity.this, "Lütfen 3 haneli bir ID girin.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!targetId.isEmpty()) {
                 SocialManager.getInstance().sendFriendRequest(targetId, new SocialManager.SocialCallback() {
                     @Override
