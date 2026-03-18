@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             if (tvVersion != null) tvVersion.setText("v" + v);
         } catch (Exception e) {
-            if (tvVersion != null) tvVersion.setText("v4.6");
+            if (tvVersion != null) tvVersion.setText("v5.0");
         }
 
         // Setup background update checker
@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
             WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
         } catch (Exception e) {}
 
-        // Otomatik Giriş ve Deep Link Kontrolü
-        handleIncomingIntent(getIntent());
-        
         setupUserSession();
 
         // Davet Butonu
@@ -103,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         if (btnMusicToggle != null) {
             btnMusicToggle.setOnClickListener(v -> {
                 musicManager.toggleMusic();
-                updateMusicButton();
             });
         }
 
@@ -111,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
         boolean autoPlayMusic = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("auto_play_music", true);
         if (autoPlayMusic) {
             musicManager.playMusic();
-            updateMusicButton();
         }
 
         // Sosyal Butonlar
@@ -185,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(sendIntent);
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(this, "WhatsApp yüklü değil.", Toast.LENGTH_SHORT).show();
-            // Fallback to general sharing
             sendIntent.setPackage(null);
             startActivity(Intent.createChooser(sendIntent, "Arkadaşını Davet Et"));
         }
@@ -236,11 +230,5 @@ public class MainActivity extends AppCompatActivity {
             })
             .setNegativeButton("Iptal", null)
             .show();
-    }
-
-    private void updateMusicButton() {
-        if (musicManager == null || btnMusicToggle == null) return;
-        // Since btnMusicToggle is a View (ConstraintLayout child), we can't directly set text unless it's a Button or TextView
-        // In the new UI, it's a CardView containing a LinearLayout
     }
 }
