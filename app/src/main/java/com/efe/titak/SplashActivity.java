@@ -9,9 +9,6 @@ import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.efe.titak.manager.SocialManager;
-import com.google.android.gms.games.GamesSignInClient;
-import com.google.android.gms.games.PlayGames;
-import com.google.android.gms.games.PlayGamesSdk;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -58,9 +55,6 @@ public class SplashActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Play Games SDK'yı başlat
-        PlayGamesSdk.initialize(this);
-
         // İzinleri kontrol et ve iste
         if (!hasPermissions()) {
             android.view.View dialogView = android.view.LayoutInflater.from(this).inflate(android.R.layout.simple_list_item_1, null);
@@ -87,9 +81,6 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startFlow() {
-        // Play Games Giriş Kontrolü
-        checkPlayGamesSignIn();
-
         // 2 saniye sonra otomatik geçiş yap
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isFinishing()) proceedToNext();
@@ -103,18 +94,6 @@ public class SplashActivity extends AppCompatActivity {
             // İzinler ne olursa olsun devam et (user said "one time")
             startFlow();
         }
-    }
-
-    private void checkPlayGamesSignIn() {
-        GamesSignInClient signInClient = PlayGames.getGamesSignInClient(this);
-        signInClient.isAuthenticated().addOnCompleteListener(task -> {
-            boolean isAuthenticated = (task.isSuccessful() && task.getResult().isAuthenticated());
-            if (isAuthenticated) {
-                signInClient.requestServerSideAccess("", false).addOnCompleteListener(accessTask -> {
-                    SocialManager.getInstance().syncUserProfile("GP_ID_LINKED", "Oyuncu", null);
-                });
-            }
-        });
     }
 
     private void proceedToNext() {
