@@ -1,8 +1,9 @@
 package com.efe.titak;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -36,7 +37,8 @@ public class ChatActivity extends AppCompatActivity {
         rvMessages = findViewById(R.id.rvMessages);
         rvMessages.setLayoutManager(new LinearLayoutManager(this));
 
-        android.widget.ImageView btnSend = findViewById(R.id.btnSend);
+        ImageView btnSend = findViewById(R.id.btnSend);
+        ImageView btnCall = findViewById(R.id.btnCall);
 
         btnSend.setOnClickListener(v -> {
             String text = etMessage.getText().toString().trim();
@@ -55,8 +57,15 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        // TODO: Implement message listener/adapter
-        Toast.makeText(this, "Sohbet sistemi aktif (Mesajlar Firestore'a kaydediliyor)", Toast.LENGTH_LONG).show();
+        // Telsiz Bağlantısını Başlat
+        btnCall.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CallActivity.class);
+            intent.putExtra("targetUid", targetUid);
+            intent.putExtra("targetName", targetName);
+            startActivity(intent);
+        });
+
+        Toast.makeText(this, "Telsiz ve Mesajlaşma Aktif", Toast.LENGTH_SHORT).show();
     }
 
     @Override

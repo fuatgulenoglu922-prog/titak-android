@@ -2,8 +2,11 @@ package com.efe.titak;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -18,30 +21,34 @@ import io.agora.rtc2.ChannelMediaOptions;
 
 public class CallActivity extends AppCompatActivity {
 
-    private final String appId = "YOUR_AGORA_APP_ID"; // Placeholder
-    private String channelName = "titak_test";
-    private String token = null;
-
+    private final String appId = "YOUR_AGORA_APP_ID"; // Buraya Agora App ID gelecek
+    private String channelName = "titak_radio_default";
     private RtcEngine mRtcEngine;
+    
     private TextView tvCallStatus;
+    private Button btnPushToTalk;
+    private MediaPlayer beepStartPlayer, beepEndPlayer;
 
     private static final int PERMISSION_REQ_ID = 22;
-    private static final String[] REQUESTED_PERMISSIONS = {
-            Manifest.permission.RECORD_AUDIO
-    };
+    private static final String[] REQUESTED_PERMISSIONS = { Manifest.permission.RECORD_AUDIO };
 
     private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() {
         @Override
         public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
-            runOnUiThread(() -> tvCallStatus.setText("Baglandi"));
+            runOnUiThread(() -> {
+                tvCallStatus.setText("TELSİZ AKTİF - KANAL: " + channel);
+                Toast.makeText(CallActivity.this, "Telsiz Ağına Bağlanıldı", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        @Override
+        public void onUserJoined(int uid, int elapsed) {
+            runOnUiThread(() -> Toast.makeText(CallActivity.this, "Bir birim ağa katıldı", Toast.LENGTH_SHORT).show());
         }
 
         @Override
         public void onUserOffline(int uid, int reason) {
-            runOnUiThread(() -> {
-                tvCallStatus.setText("Kullanici ayrildi");
-                finish();
-            });
+            runOnUiThread(() -> Toast.makeText(CallActivity.this, "Bir birim ağdan ayrıldı", Toast.LENGTH_SHORT).show());
         }
     };
 
@@ -51,21 +58,68 @@ public class CallActivity extends AppCompatActivity {
         setContentView(R.layout.activity_call);
 
         tvCallStatus = findViewById(R.id.tvCallStatus);
+        btnPushToTalk = findViewById(R.id.btnPushToTalk);
         
+        // Ses efektlerini hazırla (Telsiz bip sesleri)
+        beepStartPlayer = MediaPlayer.create(this, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+        beepEndPlayer = MediaPlayer.create(this, android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+
         if (checkSelfPermission()) {
             initAgoraEngineAndJoinChannel();
         } else {
             ActivityCompat.requestPermissions(this, REQUESTED_PERMISSIONS, PERMISSION_REQ_ID);
         }
 
-        findViewById(R.id.fabDecline).setOnClickListener(v -> {
+        setupPushToTalk();
+
+        findViewById(R.id.btnEndCall).setOnClickListener(v -> {
             leaveChannel();
             finish();
         });
+        
+        // Hedef ismi (Eğer birinden geldiyse)
+        String targetName = getIntent().getStringExtra("targetName");
+        if (targetName != null) {
+            ((TextView)findViewById(R.id.tvTargetName)).setText(targetName + " ile Telsiz");
+            channelName = "radio_" + targetName.toLowerCase();
+        }
+    }
 
-        findViewById(R.id.fabAccept).setOnClickListener(v -> {
-            // Logic for answering
+    private void setupPushToTalk() {
+        btnPushToTalk.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Basıldığında: Sesi aç ve bip çal
+                    startTalking();
+                    return true;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    // Bırakıldığında: Sesi kapat
+                    stopTalking();
+                    return true;
+            }
+            return false;
         });
+    }
+
+    private void startTalking() {
+        if (mRtcEngine != null) {
+            mRtcEngine.muteLocalAudioStream(false);
+            btnPushToTalk.setText("KONUŞUYORSUN...");
+            btnPushToTalk.setScaleX(1.1f);
+            btnPushToTalk.setScaleY(1.1f);
+            if (beepStartPlayer != null) beepStartPlayer.start();
+        }
+    }
+
+    private void stopTalking() {
+        if (mRtcEngine != null) {
+            mRtcEngine.muteLocalAudioStream(true);
+            btnPushToTalk.setText("BAS VE KONUŞ");
+            btnPushToTalk.setScaleX(1.0f);
+            btnPushToTalk.setScaleY(1.0f);
+            if (beepEndPlayer != null) beepEndPlayer.start();
+        }
     }
 
     private boolean checkSelfPermission() {
@@ -76,48 +130,24 @@ public class CallActivity extends AppCompatActivity {
         try {
             RtcEngineConfig config = new RtcEngineConfig();
             config.mContext = getBaseContext();
-            config.mAppId = appId;
+            config.mAppId = "44440000aaaa"; // Buraya geçerli bir App ID girilmeli
             config.mEventHandler = mRtcEventHandler;
             mRtcEngine = RtcEngine.create(config);
+            
+            // Telsiz ses efekti (Polis telsizi gibi cızırtılı olması için)
+            mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_CHATROOM_ENTERTAINMENT);
+            
+            // Başlangıçta mikrofon kapalı (Bas-Konuş mantığı)
+            mRtcEngine.muteLocalAudioStream(true);
+
+            ChannelMediaOptions options = new ChannelMediaOptions();
+            options.autoSubscribeAudio = true;
+            options.publishMicrophoneTrack = true;
+            mRtcEngine.joinChannel(null, channelName, 0, options);
+            
         } catch (Exception e) {
-            e.printStackTrace();
-            return;
+            Toast.makeText(this, "Telsiz başlatılamadı", Toast.LENGTH_SHORT).show();
         }
-        mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION);
-        
-        // Ses Değiştirici Uygula
-        applyVoiceEffect();
-        
-        ChannelMediaOptions options = new ChannelMediaOptions();
-        options.autoSubscribeAudio = true;
-        options.publishMicrophoneTrack = true;
-        mRtcEngine.joinChannel(token, channelName, 0, options);
-    }
-
-    private void applyVoiceEffect() {
-        int effectIndex = getSharedPreferences("pro_prefs", MODE_PRIVATE).getInt("voice_effect", 0);
-        if (mRtcEngine == null) return;
-
-        switch (effectIndex) {
-            case 1: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_OLDMAN); break;
-            case 2: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_BOY); break;
-            case 3: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_PIGKING); break;
-            case 4: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_HULK); break;
-            case 5: // mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_CHIPMUNK); break;
-            case 6: // mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_BEE); break;
-            case 7: mRtcEngine.setAudioEffectPreset(Constants.VOICE_CHANGER_EFFECT_SISTER); break; 
-            case 8: mRtcEngine.setAudioEffectPreset(Constants.STYLE_TRANSFORMATION_POPULAR); break;
-            case 9: mRtcEngine.setAudioEffectPreset(Constants.ROOM_ACOUSTICS_ETHEREAL); break;
-            case 10: mRtcEngine.setAudioEffectPreset(Constants.STYLE_TRANSFORMATION_RNB); break;
-            default: mRtcEngine.setAudioEffectPreset(Constants.AUDIO_EFFECT_OFF); break;
-        }
-    }
-
-    private boolean isMuted = false;
-    public void onMuteClicked(View view) {
-        isMuted = !isMuted;
-        mRtcEngine.muteLocalAudioStream(isMuted);
-        Toast.makeText(this, isMuted ? "Sessize alindi" : "Ses acildi", Toast.LENGTH_SHORT).show();
     }
 
     private void leaveChannel() {
@@ -131,5 +161,7 @@ public class CallActivity extends AppCompatActivity {
         super.onDestroy();
         leaveChannel();
         RtcEngine.destroy();
+        if (beepStartPlayer != null) beepStartPlayer.release();
+        if (beepEndPlayer != null) beepEndPlayer.release();
     }
 }
