@@ -15,7 +15,7 @@
         android:background="#CC1A1C21"
         android:paddingHorizontal="20dp"
         android:elevation="8dp"
-        app:layout_topToTop="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="0dp"
@@ -42,8 +42,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_topToBottom="@id/header"
-        app:layout_bottomToBottom="parent">
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -201,7 +201,7 @@
                     <LinearLayout
                         android:id="@+id/btn_settings"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="parent"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:clickable="true"
