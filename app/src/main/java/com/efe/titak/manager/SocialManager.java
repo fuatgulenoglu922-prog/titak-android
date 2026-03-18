@@ -33,7 +33,6 @@ public class SocialManager {
     public void setupLocalUser(String displayName, String titakId, String localUid) {
         String uid = localUid != null ? localUid : "USER_" + java.util.UUID.randomUUID().toString().substring(0, 8);
         
-        // Eğer titakId yoksa oluştur (Her zaman 4 haneli sayı)
         String finalTitakId = titakId;
         if (finalTitakId == null || finalTitakId.isEmpty()) {
             finalTitakId = String.valueOf(new Random().nextInt(9000) + 1000);
@@ -42,15 +41,31 @@ public class SocialManager {
         currentUser = new User(uid, "LOCAL", finalTitakId, displayName);
         currentUser.setOnline(true);
         
-        // Firestore'a kaydet/güncelle (ID ile aramada bulunabilmesi için kritik)
         db.collection("users").document(uid).set(currentUser, SetOptions.merge())
             .addOnSuccessListener(aVoid -> Log.d(TAG, "Kullanıcı Firestore'a kaydedildi: " + displayName))
             .addOnFailureListener(e -> Log.e(TAG, "Firestore kayıt hatası", e));
             
-        // TitakId Indexlemesi (Aramayı hızlandırmak ve hatayı önlemek için)
         Map<String, Object> index = new HashMap<>();
         index.put("uid", uid);
         db.collection("id_index").document(finalTitakId).set(index);
+    }
+
+    public void sendMessage(String targetUid, String text, SocialCallback callback) {
+        if (currentUser == null) {
+            callback.onError("Giriş yapılmamış");
+            return;
+        }
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("fromUid", currentUser.getUid());
+        message.put("text", text);
+        message.put("timestamp", System.currentTimeMillis());
+
+        String chatId = getChatId(currentUser.getUid(), targetUid);
+        db.collection("chats").document(chatId).collection("messages")
+                .add(message)
+                .addOnSuccessListener(documentReference -> callback.onSuccess("Mesaj gönderildi"))
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
     public void sendFriendRequest(String targetTitakId, SocialCallback callback) {
@@ -64,7 +79,6 @@ public class SocialManager {
             return;
         }
 
-        // Önce ID indexinden UID'yi bul (Daha garantili yol)
         db.collection("id_index").document(targetTitakId).get().addOnSuccessListener(doc -> {
             if (doc.exists()) {
                 String targetUid = doc.getString("uid");
@@ -72,7 +86,6 @@ public class SocialManager {
                     executeFriendRequest(targetUid, callback);
                 }
             } else {
-                // Alternatif: Doğrudan users koleksiyonunda ara
                 db.collection("users")
                     .whereEqualTo("titakId", targetTitakId)
                     .get()
@@ -108,7 +121,6 @@ public class SocialManager {
         
         long now = System.currentTimeMillis();
         
-        // Karşılıklı arkadaş ekle
         Map<String, Object> friendData = new HashMap<>();
         friendData.put("uid", requesterUid);
         friendData.put("displayName", requesterName);
@@ -123,7 +135,6 @@ public class SocialManager {
         
         db.collection("users").document(requesterUid).collection("friends").document(currentUser.getUid()).set(myData);
             
-        // İsteği sil
         db.collection("users").document(currentUser.getUid()).collection("friendRequests").document(requesterUid).delete()
             .addOnSuccessListener(aVoid -> callback.onSuccess("Arkadaş eklendi!"))
             .addOnFailureListener(e -> callback.onError(e.getMessage()));
