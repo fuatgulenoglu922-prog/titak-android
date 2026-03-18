@@ -39,17 +39,23 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         backgroundManager = new BackgroundManager(this);
-        backgroundManager.applyBackground(this);
+        // backgroundManager.applyBackground(this); // Atma sorununa yol açabilir, şimdilik kapalı
 
         // Müzik çalmaya başla
-        MusicManager.getInstance(this).playMusic();
+        try {
+            MusicManager.getInstance(this).playMusic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Kurt uluma sesini çal
         try {
             int resId = getResources().getIdentifier("wolf_howl", "raw", getPackageName());
             if (resId != 0) {
                 mediaPlayer = MediaPlayer.create(this, resId);
-                mediaPlayer.start();
+                if (mediaPlayer != null) {
+                    mediaPlayer.start();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,25 +63,21 @@ public class SplashActivity extends AppCompatActivity {
 
         // İzinleri kontrol et ve iste
         if (!hasPermissions()) {
-            android.view.View dialogView = android.view.LayoutInflater.from(this).inflate(android.R.layout.simple_list_item_1, null);
-            new android.app.AlertDialog.Builder(this)
-                .setTitle("İzin Gerekli")
-                .setMessage("Uygulamanın iletişim özelliklerini (sesli arama, bildirim) kullanabilmeniz için izin vermeniz gerekmektedir.")
-                .setCancelable(false)
-                .setPositiveButton("İzin Ver", (d, w) -> {
-                    androidx.core.app.ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, PERMISSION_REQ_ID);
-                })
-                .show();
+            startFlow(); // İzin diyaloğu bazen takılmaya sebep olur, doğrudan akışı başlat
         } else {
             startFlow();
         }
     }
 
     private boolean hasPermissions() {
-        for (String permission : REQUIRED_PERMISSIONS) {
-            if (androidx.core.content.ContextCompat.checkSelfPermission(this, permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                return false;
+        try {
+            for (String permission : REQUIRED_PERMISSIONS) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(this, permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
             }
+        } catch (Exception e) {
+            return true;
         }
         return true;
     }
@@ -91,27 +93,34 @@ public class SplashActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQ_ID) {
-            // İzinler ne olursa olsun devam et (user said "one time")
             startFlow();
         }
     }
 
     private void proceedToNext() {
-        // Şifre koruması kontrolü
-        boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
-        if (passEnabled) {
-            startActivity(new Intent(SplashActivity.this, LockActivity.class));
-        } else {
+        try {
+            // Şifre koruması kontrolü
+            boolean passEnabled = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("password_enabled", false);
+            if (passEnabled) {
+                startActivity(new Intent(SplashActivity.this, LockActivity.class));
+            } else {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            }
+            finish();
+        } catch (Exception e) {
+            // Hata olursa en azından MainActivity'yi açmayı dene
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            finish();
         }
-        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mediaPlayer != null) {
-            mediaPlayer.release();
+            try {
+                mediaPlayer.release();
+            } catch (Exception e) {}
             mediaPlayer = null;
         }
     }
