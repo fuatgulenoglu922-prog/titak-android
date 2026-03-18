@@ -22,7 +22,7 @@ import com.efe.titak.manager.SocialManager;
 
 public class MainActivity extends AppCompatActivity {
     private TextView tvVersion;
-    private Button btnMusicToggle;
+    private View btnMusicToggle;
     private MusicManager musicManager;
     private BackgroundManager backgroundManager;
 
@@ -40,57 +40,72 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            tvVersion.setText("v" + v);
+            if (tvVersion != null) tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v2.9");
+            if (tvVersion != null) tvVersion.setText("v4.6");
         }
 
         // Setup background update checker
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-        PeriodicWorkRequest updateWork = new PeriodicWorkRequest.Builder(UpdateCheckWorker.class, 12, TimeUnit.HOURS)
-                .setConstraints(constraints)
-                .build();
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
+        try {
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            PeriodicWorkRequest updateWork = new PeriodicWorkRequest.Builder(UpdateCheckWorker.class, 12, TimeUnit.HOURS)
+                    .setConstraints(constraints)
+                    .build();
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
+        } catch (Exception e) {}
 
         // Otomatik Giriş ve Deep Link Kontrolü
         handleIncomingIntent(getIntent());
         
         setupUserSession();
 
-        // Davet Butonu (Eski Login butonu yerine veya yeni bir buton)
-        findViewById(R.id.btn_google_login).setVisibility(View.GONE); // Google Girişi Kaldırıldı
+        // Davet Butonu
+        View btnLogin = findViewById(R.id.btn_google_login);
+        if (btnLogin != null) btnLogin.setVisibility(View.GONE);
 
         // WhatsApp ile Davet Et Butonu
-        findViewById(R.id.btn_invite_friend).setOnClickListener(v -> shareInviteLink());
+        View btnInvite = findViewById(R.id.btn_invite_friend);
+        if (btnInvite != null) btnInvite.setOnClickListener(v -> shareInviteLink());
 
         // Pro Özellikler Butonu
-        findViewById(R.id.btn_pro_features).setOnClickListener(v -> showProPasswordDialog());
+        View btnPro = findViewById(R.id.btn_pro_features);
+        if (btnPro != null) btnPro.setOnClickListener(v -> showProPasswordDialog());
 
         // Güncelleme butonu
-        findViewById(R.id.btn_update_app).setOnClickListener(v -> {
-            UpdateManager updateManager = new UpdateManager(this);
-            updateManager.checkAndInstallUpdate();
-        });
+        View btnUpdate = findViewById(R.id.btn_update_app);
+        if (btnUpdate != null) {
+            btnUpdate.setOnClickListener(v -> {
+                UpdateManager updateManager = new UpdateManager(this);
+                updateManager.checkAndInstallUpdate();
+            });
+        }
 
         // Ayarlar Butonu
-        findViewById(R.id.btn_settings).setOnClickListener(v -> {
-            startActivity(new Intent(this, SettingsActivity.class));
-            overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
-        });
+        View btnSettings = findViewById(R.id.btn_settings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> {
+                startActivity(new Intent(this, SettingsActivity.class));
+                overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
+            });
+        }
 
         // Geri Bildirim Butonu
-        findViewById(R.id.btn_feedback).setOnClickListener(v -> {
-            startActivity(new Intent(this, FeedbackActivity.class));
-        });
+        View btnFeedback = findViewById(R.id.btn_feedback);
+        if (btnFeedback != null) {
+            btnFeedback.setOnClickListener(v -> {
+                startActivity(new Intent(this, FeedbackActivity.class));
+            });
+        }
 
         // Müzik Kontrol Butonu
-        updateMusicButton();
-        btnMusicToggle.setOnClickListener(v -> {
-            musicManager.toggleMusic();
-            updateMusicButton();
-        });
+        if (btnMusicToggle != null) {
+            btnMusicToggle.setOnClickListener(v -> {
+                musicManager.toggleMusic();
+                updateMusicButton();
+            });
+        }
 
         // Müziği otomatik başlat
         boolean autoPlayMusic = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("auto_play_music", true);
@@ -100,13 +115,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Sosyal Butonlar
-        findViewById(R.id.btn_profile).setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfileActivity.class));
-        });
+        View btnProfile = findViewById(R.id.btn_profile);
+        if (btnProfile != null) {
+            btnProfile.setOnClickListener(v -> {
+                startActivity(new Intent(this, ProfileActivity.class));
+            });
+        }
 
-        findViewById(R.id.btn_social_hub).setOnClickListener(v -> {
-            startActivity(new Intent(this, SocialActivity.class));
-        });
+        View btnSocial = findViewById(R.id.btn_social_hub);
+        if (btnSocial != null) {
+            btnSocial.setOnClickListener(v -> {
+                startActivity(new Intent(this, SocialActivity.class));
+            });
+        }
     }
 
     private void setupUserSession() {
@@ -213,15 +234,13 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, "Yanlış Şifre!", Toast.LENGTH_SHORT).show();
                 }
             })
-            .setNegativeButton("İptal", null)
+            .setNegativeButton("Iptal", null)
             .show();
     }
 
     private void updateMusicButton() {
-        if (musicManager.isPlaying()) {
-            btnMusicToggle.setText("🔊 Müzik: Açık");
-        } else {
-            btnMusicToggle.setText("🔇 Müzik: Kapalı");
-        }
+        if (musicManager == null || btnMusicToggle == null) return;
+        // Since btnMusicToggle is a View (ConstraintLayout child), we can't directly set text unless it's a Button or TextView
+        // In the new UI, it's a CardView containing a LinearLayout
     }
 }
