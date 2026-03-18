@@ -3,34 +3,21 @@ package com.efe.titak;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.media.projection.MediaProjectionManager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import java.util.concurrent.TimeUnit;
 import com.efe.titak.worker.UpdateCheckWorker;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.efe.titak.manager.SocialManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,8 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnMusicToggle;
     private MusicManager musicManager;
     private BackgroundManager backgroundManager;
-    private GoogleSignInClient mGoogleSignInClient;
-    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +38,11 @@ public class MainActivity extends AppCompatActivity {
         btnMusicToggle = findViewById(R.id.btn_music_toggle);
         musicManager = MusicManager.getInstance(this);
 
-        // Configure Google Sign-In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             tvVersion.setText("v" + v);
         } catch (Exception e) {
-            tvVersion.setText("v3.8");
+            tvVersion.setText("v2.9");
         }
 
         // Setup background update checker
@@ -76,28 +54,16 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
 
-        // Check if we need to show fallback login automatically
-        boolean isLocalUser = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
-        if (!isLocalUser && FirebaseAuth.getInstance().getCurrentUser() == null) {
-            // User hasn't set a local name and isn't typed to Firebase.
-            // Don't force automatically yet, but when they click Login, we catch error.
-        }
+        // Otomatik Giriş ve Deep Link Kontrolü
+        handleIncomingIntent(getIntent());
+        
+        setupUserSession();
 
-        if (isLocalUser) {
-            String localName = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_display_name", "Misafir");
-            String localId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
-            String localUid = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_uid", "LOCAL_" + Math.abs(localName.hashCode()));
-            SocialManager.getInstance().setupLocalUser(localName, localId, localUid);
-        }
+        // Davet Butonu (Eski Login butonu yerine veya yeni bir buton)
+        findViewById(R.id.btn_google_login).setVisibility(View.GONE); // Google Girişi Kaldırıldı
 
-        // Google Login / Fallback Login Butonu
-        findViewById(R.id.btn_google_login).setOnClickListener(v -> {
-            if(FirebaseAuth.getInstance().getCurrentUser() != null) {
-                 Toast.makeText(this, "Zaten giriş yapıldı.", Toast.LENGTH_SHORT).show();
-            } else {
-                 signIn();
-            }
-        });
+        // WhatsApp ile Davet Et Butonu
+        findViewById(R.id.btn_invite_friend).setOnClickListener(v -> shareInviteLink());
 
         // Pro Özellikler Butonu
         findViewById(R.id.btn_pro_features).setOnClickListener(v -> showProPasswordDialog());
@@ -143,99 +109,90 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
-                // If Google Login fails (like Error 10), use fallback system
-                Toast.makeText(this, "Google Girişi Başarısız. Yerel Giriş Açılıyor.", Toast.LENGTH_SHORT).show();
-                showFallbackLoginDialog(null);
-            }
+    private void setupUserSession() {
+        boolean isLocalUser = getSharedPreferences("titak_prefs", MODE_PRIVATE).getBoolean("is_local_user", false);
+        if (!isLocalUser) {
+            showInitialSetupDialog();
+        } else {
+            String localName = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_display_name", "Kullanıcı");
+            String localId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
+            String localUid = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_uid", null);
+            SocialManager.getInstance().setupLocalUser(localName, localId, localUid);
         }
     }
 
-    private void showFallbackLoginDialog(GoogleSignInAccount account) {
+    private void showInitialSetupDialog() {
         EditText etUsername = new EditText(this);
-        etUsername.setHint("Kullanıcı Adı (Örn: Efe)");
-        etUsername.setInputType(android.text.InputType.TYPE_CLASS_TEXT);
-        
-        String defaultName = account != null && account.getDisplayName() != null ? account.getDisplayName() : "";
-        if (!defaultName.isEmpty()) {
-            etUsername.setText(defaultName);
-        }
+        etUsername.setHint("Adınız");
 
         new AlertDialog.Builder(this)
-            .setTitle("TiTak'a Hoş Geldin")
-            .setMessage("Google girişi yapılamadı. Lütfen uygulamayı kullanmak için bir İsim belirle.")
+            .setTitle("TiTak'a Hoş Geldiniz")
+            .setMessage("Lütfen devam etmek için bir kullanıcı adı girin.")
             .setView(etUsername)
             .setCancelable(false)
-            .setPositiveButton("Giriş Yap", (d, w) -> {
-                String username = etUsername.getText().toString().trim();
-                if (username.isEmpty()) {
-                    username = defaultName.isEmpty() ? "Misafir" : defaultName;
-                }
+            .setPositiveButton("Başla", (d, w) -> {
+                String name = etUsername.getText().toString().trim();
+                if (name.isEmpty()) name = "Kullanıcı" + new java.util.Random().nextInt(100);
                 
-                String newTitakId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", null);
-                if (newTitakId == null) {
-                    newTitakId = String.valueOf(new java.util.Random().nextInt(9000) + 1000);
-                }
-                String email = account != null ? account.getEmail() : "";
-                String localUid = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_uid", null);
-                if (localUid == null) {
-                    localUid = "LOCAL_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
-                }
+                String titakId = String.valueOf(new java.util.Random().nextInt(9000) + 1000);
+                String uid = "USER_" + java.util.UUID.randomUUID().toString().substring(0, 8);
                 
-                // Save locally
                 getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
-                    .putString("local_display_name", username)
+                    .putString("local_display_name", name)
+                    .putString("local_titak_id", titakId)
+                    .putString("local_uid", uid)
                     .putBoolean("is_local_user", true)
-                    .putString("local_titak_id", newTitakId)
-                    .putString("local_email", email)
-                    .putString("local_uid", localUid)
                     .apply();
-
-                Toast.makeText(this, "Hoşgeldin, " + username + "!", Toast.LENGTH_SHORT).show();
-                
-                // Create minimal SocialManager setup for local user
-                SocialManager.getInstance().setupLocalUser(username, newTitakId, localUid);
-                recreate();
+                    
+                SocialManager.getInstance().setupLocalUser(name, titakId, uid);
+                Toast.makeText(this, "Hoş geldin " + name, Toast.LENGTH_SHORT).show();
             })
             .show();
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        String googlePlayId = "GP_" + FirebaseAuth.getInstance().getCurrentUser().getUid().substring(0, 5);
-                        SocialManager.getInstance().syncUserProfile(
-                                googlePlayId,
-                                FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                null
-                        );
-                        // Save that we are not local
-                        getSharedPreferences("titak_prefs", MODE_PRIVATE).edit()
-                            .putBoolean("is_local_user", false)
-                            .apply();
-                            
-                        Toast.makeText(this, "Giris Basarili!", Toast.LENGTH_SHORT).show();
-                        recreate();
-                    } else {
-                        Toast.makeText(this, "Kimlik Dogrulama Hatasi.", Toast.LENGTH_SHORT).show();
-                        showFallbackLoginDialog(account);
+    private void shareInviteLink() {
+        String myId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", "");
+        String inviteMsg = "TiTak'ta benimle konuşmaya başla! ID'm: " + myId + "\nUygulamayı indir ve bu linke tıkla: https://titak.efe.com/invite?id=" + myId;
+        
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteMsg);
+        sendIntent.setType("text/plain");
+        sendIntent.setPackage("com.whatsapp");
+        
+        try {
+            startActivity(sendIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "WhatsApp yüklü değil.", Toast.LENGTH_SHORT).show();
+            // Fallback to general sharing
+            sendIntent.setPackage(null);
+            startActivity(Intent.createChooser(sendIntent, "Arkadaşını Davet Et"));
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIncomingIntent(intent);
+    }
+
+    private void handleIncomingIntent(Intent intent) {
+        Uri data = intent.getData();
+        if (data != null && data.getPath() != null && data.getPath().equals("/invite")) {
+            String inviterId = data.getQueryParameter("id");
+            if (inviterId != null && !inviterId.isEmpty()) {
+                SocialManager.getInstance().sendFriendRequest(inviterId, new SocialManager.SocialCallback() {
+                    @Override
+                    public void onSuccess(String message) {
+                        Toast.makeText(MainActivity.this, "Arkadaş otomatik olarak eklendi!", Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onError(String error) {
+                        Toast.makeText(MainActivity.this, "Arkadaş eklenirken hata: " + error, Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        }
     }
 
     private void showProPasswordDialog() {

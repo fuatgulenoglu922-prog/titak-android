@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@color/bg_dark_primary">
 
-    <!-- Header / Custom App Bar (Like Discord Top Bar) -->
+    <!-- Header / Custom App Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -37,7 +37,8 @@
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
             android:textStyle="bold"
-            android:layout_marginEnd="16dp" />
+            android:layout_marginEnd="16dp"
+            android:text="v2.9" />
 
         <ImageView
             android:id="@+id/btn_google_login"
@@ -46,7 +47,17 @@
             android:src="@drawable/ic_coin"
             android:background="@drawable/bg_neon_card"
             android:padding="8dp"
-            app:tint="@color/text_normal" />
+            app:tint="@color/text_normal"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/btn_invite_friend"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_menu_share"
+            android:background="@drawable/bg_neon_card"
+            android:padding="8dp"
+            app:tint="@color/brand_green" />
     </LinearLayout>
 
     <ScrollView
@@ -60,7 +71,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- User Status Card (Discord Profile Banner Style) -->
+            <!-- User Status Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,18 +113,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="İletişime Hazır"
+                        android:text="TiTak Arkadaş Sistemi Aktif"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Server Actions / Features -->
+            <!-- Actions -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ÖNE ÇIKANLAR"
+                android:text="HIZLI EYLEMLER"
                 android:textColor="@color/text_dark"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="12sp"
@@ -122,42 +133,40 @@
                 android:layout_marginStart="4dp"/>
 
             <Button
+                android:id="@+id/btn_share_whatsapp"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="📲 WHATSAPP İLE ARKADAŞ DAVET ET"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:backgroundTint="@color/brand_green"
+                android:textColor="@color/bg_dark_tertiary"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button" />
+
+            <Button
                 android:id="@+id/btn_pro_features"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="💎 PRO ÖZELLİKLER (SES DEĞİŞTİRİCİ)"
+                android:text="💎 PRO ÖZELLİKLER"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:background="@drawable/btn_neon_main"
                 android:textColor="@color/text_bright"
                 android:layout_marginBottom="16dp"
-                android:elevation="2dp"
-                android:stateListAnimator="@null"
                 style="@style/Widget.MaterialComponents.Button" />
                 
             <Button
                 android:id="@+id/btn_music_toggle"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="🔊 Arka Plan Müziği: Açık"
+                android:text="🔊 Müzik"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:backgroundTint="@color/bg_dark_secondary"
                 android:textColor="@color/text_normal"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_marginBottom="24dp" />
-
-            <!-- Social / Navigation -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AĞ &amp; SOSYAL"
-                android:textColor="@color/text_dark"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -173,8 +182,6 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="👤 PROFİLİM"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
                     android:backgroundTint="@color/bg_dark_secondary"
                     android:textColor="@color/text_bright"
                     style="@style/Widget.MaterialComponents.Button" />
@@ -186,30 +193,17 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="💬 ARKADAŞLAR"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:backgroundTint="@color/brand_green"
-                    android:textColor="@color/bg_dark_tertiary"
+                    android:backgroundTint="@color/brand_blurple"
+                    android:textColor="@color/text_bright"
                     style="@style/Widget.MaterialComponents.Button" />
             </LinearLayout>
 
-            <!-- Settings / Utilities Grid -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="ARAÇLAR"
-                android:textColor="@color/text_dark"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp"/>
-
+            <!-- Tools -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="4"
+                android:weightSum="3"
                 android:layout_marginBottom="24dp">
 
                 <Button
@@ -222,18 +216,6 @@
                     android:textSize="10sp"
                     android:backgroundTint="@color/bg_dark_secondary"
                     android:textColor="@color/brand_blurple"
-                    style="@style/Widget.MaterialComponents.Button" />
-                    
-                <Button
-                    android:id="@+id/btn_api"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="API"
-                    android:textSize="10sp"
-                    android:backgroundTint="@color/bg_dark_secondary"
-                    android:textColor="@color/text_muted"
                     style="@style/Widget.MaterialComponents.Button" />
 
                 <Button
@@ -260,17 +242,10 @@
                     style="@style/Widget.MaterialComponents.Button" />
             </LinearLayout>
             
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/bg_dark_tertiary"
-                android:layout_marginBottom="16dp"/>
-
-            <!-- Info text -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TiTak v3.3 Güvenli Bağlantı"
+                android:text="TiTak v2.9 - Sadece Arkadaş Daveti"
                 android:textColor="@color/text_dark"
                 android:textSize="11sp"
                 android:gravity="center"
