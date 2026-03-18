@@ -21,7 +21,7 @@ import io.agora.rtc2.ChannelMediaOptions;
 
 public class CallActivity extends AppCompatActivity {
 
-    private final String appId = "YOUR_AGORA_APP_ID"; // Buraya Agora App ID gelecek
+    private final String appId = "44440000aaaa"; // Buraya geçerli bir App ID girilmeli
     private String channelName = "titak_radio_default";
     private RtcEngine mRtcEngine;
     
@@ -36,7 +36,7 @@ public class CallActivity extends AppCompatActivity {
         @Override
         public void onJoinChannelSuccess(String channel, int uid, int elapsed) {
             runOnUiThread(() -> {
-                tvCallStatus.setText("TELSİZ AKTİF - KANAL: " + channel);
+                tvCallStatus.setText("TELSİZ AKTİF");
                 Toast.makeText(CallActivity.this, "Telsiz Ağına Bağlanıldı", Toast.LENGTH_SHORT).show();
             });
         }
@@ -77,11 +77,10 @@ public class CallActivity extends AppCompatActivity {
             finish();
         });
         
-        // Hedef ismi (Eğer birinden geldiyse)
         String targetName = getIntent().getStringExtra("targetName");
         if (targetName != null) {
-            ((TextView)findViewById(R.id.tvTargetName)).setText(targetName + " ile Telsiz");
-            channelName = "radio_" + targetName.toLowerCase();
+            ((TextView)findViewById(R.id.tvTargetName)).setText(targetName);
+            channelName = "radio_" + targetName.toLowerCase().replaceAll("\\s+", "");
         }
     }
 
@@ -89,12 +88,11 @@ public class CallActivity extends AppCompatActivity {
         btnPushToTalk.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    // Basıldığında: Sesi aç ve bip çal
                     startTalking();
+                    v.performClick();
                     return true;
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_CANCEL:
-                    // Bırakıldığında: Sesi kapat
                     stopTalking();
                     return true;
             }
@@ -106,8 +104,6 @@ public class CallActivity extends AppCompatActivity {
         if (mRtcEngine != null) {
             mRtcEngine.muteLocalAudioStream(false);
             btnPushToTalk.setText("KONUŞUYORSUN...");
-            btnPushToTalk.setScaleX(1.1f);
-            btnPushToTalk.setScaleY(1.1f);
             if (beepStartPlayer != null) beepStartPlayer.start();
         }
     }
@@ -116,8 +112,6 @@ public class CallActivity extends AppCompatActivity {
         if (mRtcEngine != null) {
             mRtcEngine.muteLocalAudioStream(true);
             btnPushToTalk.setText("BAS VE KONUŞ");
-            btnPushToTalk.setScaleX(1.0f);
-            btnPushToTalk.setScaleY(1.0f);
             if (beepEndPlayer != null) beepEndPlayer.start();
         }
     }
@@ -130,19 +124,20 @@ public class CallActivity extends AppCompatActivity {
         try {
             RtcEngineConfig config = new RtcEngineConfig();
             config.mContext = getBaseContext();
-            config.mAppId = "44440000aaaa"; // Buraya geçerli bir App ID girilmeli
+            config.mAppId = appId;
             config.mEventHandler = mRtcEventHandler;
             mRtcEngine = RtcEngine.create(config);
             
-            // Telsiz ses efekti (Polis telsizi gibi cızırtılı olması için)
-            mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_CHATROOM_ENTERTAINMENT);
+            // Agora 4.x için uyumlu ayarlar
+            mRtcEngine.setAudioProfile(Constants.AUDIO_PROFILE_SPEECH_STANDARD, Constants.AUDIO_SCENARIO_DEFAULT);
             
-            // Başlangıçta mikrofon kapalı (Bas-Konuş mantığı)
             mRtcEngine.muteLocalAudioStream(true);
 
             ChannelMediaOptions options = new ChannelMediaOptions();
             options.autoSubscribeAudio = true;
             options.publishMicrophoneTrack = true;
+            options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
+
             mRtcEngine.joinChannel(null, channelName, 0, options);
             
         } catch (Exception e) {
