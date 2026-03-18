@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.File;
@@ -51,11 +52,8 @@ public class BackgroundManager {
             Bitmap bitmap = null;
             try {
                 Random random = new Random();
-                int width = 1080 + random.nextInt(500);
-                int height = 1920 + random.nextInt(500);
                 int seed = random.nextInt(1000);
-
-                String urlStr = "https://picsum.photos/seed/" + seed + "/" + width + "/" + height;
+                String urlStr = "https://picsum.photos/seed/" + seed + "/1080/1920";
                 URL url = new URL(urlStr);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(15000);
@@ -63,8 +61,7 @@ public class BackgroundManager {
                 conn.setRequestMethod("GET");
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-                int responseCode = conn.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     InputStream input = conn.getInputStream();
                     bitmap = BitmapFactory.decodeStream(input);
                     input.close();
@@ -84,7 +81,7 @@ public class BackgroundManager {
                         Toast.makeText(context, "Rastgele arka plan ayarlandı!", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(context, "Resim indirilemedi. İnternet bağlantınızı kontrol edin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Resim indirilemedi.", Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -96,14 +93,16 @@ public class BackgroundManager {
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             if (inputStream != null) inputStream.close();
 
-            String path = saveBitmapToInternalStorage(bitmap);
-            if (path != null) {
-                saveBackgroundPath(path);
-                applyBackground(activity);
-                Toast.makeText(context, "Arka plan değiştirildi!", Toast.LENGTH_SHORT).show();
+            if (bitmap != null) {
+                String path = saveBitmapToInternalStorage(bitmap);
+                if (path != null) {
+                    saveBackgroundPath(path);
+                    applyBackground(activity);
+                    Toast.makeText(context, "Arka plan değiştirildi!", Toast.LENGTH_SHORT).show();
+                }
             }
         } catch (Exception e) {
-            Toast.makeText(context, "Resim yüklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Hata: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -113,21 +112,13 @@ public class BackgroundManager {
             Bitmap bitmap = BitmapFactory.decodeFile(path);
             if (bitmap != null) {
                 BitmapDrawable drawable = new BitmapDrawable(activity.getResources(), bitmap);
+                // Önce Window'a uygula
                 activity.getWindow().setBackgroundDrawable(drawable);
-            }
-        }
-    }
-
-    public void applyBackgroundToView(View view) {
-        String path = getBackgroundPath();
-        if (path != null && new File(path).exists()) {
-            Bitmap bitmap = BitmapFactory.decodeFile(path);
-            if (bitmap != null) {
-                BitmapDrawable drawable = new BitmapDrawable(view.getContext().getResources(), bitmap);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    view.setBackground(drawable);
-                } else {
-                    view.setBackgroundDrawable(drawable);
+                
+                // Sonra Root View'ın arka planını temizle ki window arka planı gözüksün
+                View rootView = ((ViewGroup) activity.findViewById(android.R.id.content)).getChildAt(0);
+                if (rootView != null) {
+                    rootView.setBackground(null);
                 }
             }
         }
@@ -137,9 +128,7 @@ public class BackgroundManager {
         String path = getBackgroundPath();
         if (path != null) {
             File file = new File(path);
-            if (file.exists()) {
-                file.delete();
-            }
+            if (file.exists()) file.delete();
         }
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit()
@@ -147,16 +136,11 @@ public class BackgroundManager {
                 .apply();
     }
 
-    public boolean hasBackground() {
-        String path = getBackgroundPath();
-        return path != null && new File(path).exists();
-    }
-
     private String saveBitmapToInternalStorage(Bitmap bitmap) {
         try {
-            File file = new File(context.getFilesDir(), "background.jpg");
+            File file = new File(context.getFilesDir(), "custom_bg.jpg");
             FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
             return file.getAbsolutePath();
         } catch (Exception e) {

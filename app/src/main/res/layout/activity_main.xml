@@ -1,256 +1,248 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/bg_dark_primary">
 
-    <!-- Header / Custom App Bar -->
+    <!-- Header -->
     <LinearLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="70dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@color/bg_dark_tertiary"
-        android:paddingHorizontal="16dp"
-        android:elevation="4dp">
+        android:background="#CC1A1C21"
+        android:paddingHorizontal="20dp"
+        android:elevation="8dp"
+        app:layout_topToTop="parent">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TiTak"
-            android:textSize="20sp"
+            android:text="TiTak 4.0"
+            android:textSize="24sp"
             android:textColor="@color/text_bright"
             android:textStyle="bold"
             android:fontFamily="sans-serif-black" />
 
-        <TextView
-            android:id="@+id/tv_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="@color/text_muted"
-            android:background="@drawable/bg_neon_card"
-            android:backgroundTint="@color/bg_dark_floating"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textStyle="bold"
-            android:layout_marginEnd="16dp"
-            android:text="v2.9" />
-
-        <ImageView
-            android:id="@+id/btn_google_login"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_coin"
-            android:background="@drawable/bg_neon_card"
-            android:padding="8dp"
-            app:tint="@color/text_normal"
-            android:visibility="gone" />
-
         <ImageView
             android:id="@+id/btn_invite_friend"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:src="@android:drawable/ic_menu_share"
             android:background="@drawable/bg_neon_card"
-            android:padding="8dp"
+            android:padding="10dp"
+            android:contentDescription="Invite"
             app:tint="@color/brand_green" />
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_topToBottom="@id/header"
+        app:layout_bottomToBottom="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp"
+            android:gravity="center_horizontal">
 
-            <!-- User Status Card -->
+            <!-- Welcome Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/bg_dark_secondary">
+                android:layout_marginBottom="30dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
+                app:cardBackgroundColor="#CC2F3136">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp"
+                    android:padding="25dp"
                     android:gravity="center">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/tv_user_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-                        
-                        <View
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:background="@drawable/bg_neon_card"
-                            android:backgroundTint="@color/status_online"
-                            android:layout_marginEnd="8dp"/>
-
-                        <TextView
-                            android:id="@+id/tv_user_status"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Çevrimiçi"
-                            android:textColor="@color/text_bright"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                        android:text="Sistem Aktif"
+                        android:textColor="@color/status_online"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TiTak Arkadaş Sistemi Aktif"
+                        android:text="TiTak v4.0 Pro Sürüm"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Actions -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Main Buttons Grid -->
+            <GridLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="HIZLI EYLEMLER"
-                android:textColor="@color/text_dark"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"
-                android:layout_marginStart="4dp"/>
+                android:columnCount="2"
+                android:rowCount="2"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
+                android:layout_marginBottom="20dp">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_social"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="15dp"
+                    app:cardBackgroundColor="#CC5865F2">
+                    <LinearLayout
+                        android:id="@+id/btn_social_hub"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💬"
+                            android:textSize="30sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ARKADAŞLAR"
+                            android:textColor="@color/text_bright"
+                            android:textStyle="bold"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="15dp"
+                    app:cardBackgroundColor="#CCFEE75C">
+                    <LinearLayout
+                        android:id="@+id/btn_pro_features"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="💎"
+                            android:textSize="30sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PRO PANEL"
+                            android:textColor="#23272A"
+                            android:textStyle="bold"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="15dp"
+                    app:cardBackgroundColor="#CC2F3136">
+                    <LinearLayout
+                        android:id="@+id/btn_music_toggle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎵"
+                            android:textSize="30sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MÜZİK"
+                            android:textColor="@color/text_bright"
+                            android:textStyle="bold"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="15dp"
+                    app:cardBackgroundColor="#CC2F3136">
+                    <LinearLayout
+                        android:id="@+id/btn_settings"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚙️"
+                            android:textSize="30sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AYARLAR"
+                            android:textColor="@color/text_bright"
+                            android:textStyle="bold"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </GridLayout>
 
             <Button
-                android:id="@+id/btn_share_whatsapp"
+                android:id="@+id/btn_update_app"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="📲 WHATSAPP İLE ARKADAŞ DAVET ET"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:backgroundTint="@color/brand_green"
-                android:textColor="@color/bg_dark_tertiary"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.Button" />
-
-            <Button
-                android:id="@+id/btn_pro_features"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="💎 PRO ÖZELLİKLER"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:background="@drawable/btn_neon_main"
+                android:layout_height="60dp"
+                android:text="🚀 GÜNCELLEMELERİ KONTROL ET"
+                android:backgroundTint="#CCEB459E"
                 android:textColor="@color/text_bright"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.Button" />
-                
+                android:layout_marginTop="10dp"
+                app:cornerRadius="15dp"/>
+
             <Button
-                android:id="@+id/btn_music_toggle"
+                android:id="@+id/btn_feedback"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="🔊 Müzik"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:backgroundTint="@color/bg_dark_secondary"
-                android:textColor="@color/text_normal"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_marginBottom="24dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2"
-                android:layout_marginBottom="24dp">
-
-                <Button
-                    android:id="@+id/btn_profile"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:text="👤 PROFİLİM"
-                    android:backgroundTint="@color/bg_dark_secondary"
-                    android:textColor="@color/text_bright"
-                    style="@style/Widget.MaterialComponents.Button" />
-
-                <Button
-                    android:id="@+id/btn_social_hub"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:text="💬 ARKADAŞLAR"
-                    android:backgroundTint="@color/brand_blurple"
-                    android:textColor="@color/text_bright"
-                    style="@style/Widget.MaterialComponents.Button" />
-            </LinearLayout>
-
-            <!-- Tools -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3"
-                android:layout_marginBottom="24dp">
-
-                <Button
-                    android:id="@+id/btn_update_app"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="Güncelle"
-                    android:textSize="10sp"
-                    android:backgroundTint="@color/bg_dark_secondary"
-                    android:textColor="@color/brand_blurple"
-                    style="@style/Widget.MaterialComponents.Button" />
-
-                <Button
-                    android:id="@+id/btn_settings"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="Ayarlar"
-                    android:textSize="10sp"
-                    android:backgroundTint="@color/bg_dark_secondary"
-                    android:textColor="@color/text_muted"
-                    style="@style/Widget.MaterialComponents.Button" />
-
-                <Button
-                    android:id="@+id/btn_feedback"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_weight="1"
-                    android:text="Destek"
-                    android:textSize="10sp"
-                    android:backgroundTint="@color/bg_dark_secondary"
-                    android:textColor="@color/brand_yellow"
-                    style="@style/Widget.MaterialComponents.Button" />
-            </LinearLayout>
-            
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TiTak v2.9 - Sadece Arkadaş Daveti"
-                android:textColor="@color/text_dark"
-                android:textSize="11sp"
-                android:gravity="center"
-                android:layout_marginBottom="20dp" />
+                android:layout_height="60dp"
+                android:text="🛡️ DESTEK VE YARDIM"
+                android:backgroundTint="#CC2F3136"
+                android:textColor="@color/text_muted"
+                android:layout_marginTop="15dp"
+                app:cornerRadius="15dp"/>
 
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
