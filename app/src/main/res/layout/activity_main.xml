@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TiTak 4.0"
+            android:text="TiTak 5.0"
             android:textSize="24sp"
             android:textColor="@color/text_bright"
             android:textStyle="bold"
@@ -34,7 +34,7 @@
             android:textSize="12sp"
             android:textColor="@color/text_muted"
             android:layout_marginEnd="10dp"
-            android:text="v4.0" />
+            android:text="v5.0" />
 
         <ImageView
             android:id="@+id/btn_invite_friend"
@@ -87,7 +87,7 @@
                         android:id="@+id/tv_user_status"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sistem Aktif"
+                        android:text="TELSİZ SİSTEMİ AKTİF"
                         android:textColor="@color/status_online"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -95,7 +95,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TiTak v4.0 Pro Sürüm"
+                        android:text="TiTak v5.0 Police Edition"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp"
                         android:layout_marginTop="8dp" />
