@@ -17,7 +17,6 @@ import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import java.util.concurrent.TimeUnit;
 import com.efe.titak.worker.UpdateCheckWorker;
-import com.google.firebase.auth.FirebaseAuth;
 import com.efe.titak.manager.SocialManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +31,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         backgroundManager = new BackgroundManager(this);
-        backgroundManager.applyBackground(this);
+        // Atma sorununu önlemek için Splash'ten sonra burada güvenli yükleme
+        try {
+            backgroundManager.applyBackground(this);
+        } catch (Exception e) {}
 
         tvVersion = findViewById(R.id.tv_version);
         btnMusicToggle = findViewById(R.id.btn_music_toggle);
@@ -42,35 +44,21 @@ public class MainActivity extends AppCompatActivity {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             if (tvVersion != null) tvVersion.setText("v" + v);
         } catch (Exception e) {
-            if (tvVersion != null) tvVersion.setText("v5.0");
+            if (tvVersion != null) tvVersion.setText("v5.2");
         }
-
-        // Setup background update checker
-        try {
-            Constraints constraints = new Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build();
-            PeriodicWorkRequest updateWork = new PeriodicWorkRequest.Builder(UpdateCheckWorker.class, 12, TimeUnit.HOURS)
-                    .setConstraints(constraints)
-                    .build();
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork("UpdateCheck", androidx.work.ExistingPeriodicWorkPolicy.KEEP, updateWork);
-        } catch (Exception e) {}
 
         setupUserSession();
 
-        // Davet Butonu
+        // Buton Bağlantıları
         View btnLogin = findViewById(R.id.btn_google_login);
         if (btnLogin != null) btnLogin.setVisibility(View.GONE);
 
-        // WhatsApp ile Davet Et Butonu
         View btnInvite = findViewById(R.id.btn_invite_friend);
         if (btnInvite != null) btnInvite.setOnClickListener(v -> shareInviteLink());
 
-        // Pro Özellikler Butonu
         View btnPro = findViewById(R.id.btn_pro_features);
         if (btnPro != null) btnPro.setOnClickListener(v -> showProPasswordDialog());
 
-        // Güncelleme butonu
         View btnUpdate = findViewById(R.id.btn_update_app);
         if (btnUpdate != null) {
             btnUpdate.setOnClickListener(v -> {
@@ -79,16 +67,13 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Ayarlar Butonu
         View btnSettings = findViewById(R.id.btn_settings);
         if (btnSettings != null) {
             btnSettings.setOnClickListener(v -> {
                 startActivity(new Intent(this, SettingsActivity.class));
-                overridePendingTransition(R.anim.theme_enter, R.anim.theme_exit);
             });
         }
 
-        // Geri Bildirim Butonu
         View btnFeedback = findViewById(R.id.btn_feedback);
         if (btnFeedback != null) {
             btnFeedback.setOnClickListener(v -> {
@@ -96,20 +81,12 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Müzik Kontrol Butonu
         if (btnMusicToggle != null) {
             btnMusicToggle.setOnClickListener(v -> {
                 musicManager.toggleMusic();
             });
         }
 
-        // Müziği otomatik başlat
-        boolean autoPlayMusic = getSharedPreferences("bot_prefs", MODE_PRIVATE).getBoolean("auto_play_music", true);
-        if (autoPlayMusic) {
-            musicManager.playMusic();
-        }
-
-        // Sosyal Butonlar
         View btnProfile = findViewById(R.id.btn_profile);
         if (btnProfile != null) {
             btnProfile.setOnClickListener(v -> {
@@ -139,16 +116,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void showInitialSetupDialog() {
         EditText etUsername = new EditText(this);
-        etUsername.setHint("Adınız");
+        etUsername.setHint("Kullanıcı Adınız");
 
         new AlertDialog.Builder(this)
-            .setTitle("TiTak'a Hoş Geldiniz")
-            .setMessage("Lütfen devam etmek için bir kullanıcı adı girin.")
+            .setTitle("TiTak 5.2")
+            .setMessage("Lütfen başlamak için bir isim seçin.")
             .setView(etUsername)
             .setCancelable(false)
-            .setPositiveButton("Başla", (d, w) -> {
+            .setPositiveButton("BAŞLA", (d, w) -> {
                 String name = etUsername.getText().toString().trim();
-                if (name.isEmpty()) name = "Kullanıcı" + new java.util.Random().nextInt(100);
+                if (name.isEmpty()) name = "Birim_" + new java.util.Random().nextInt(100);
                 
                 String titakId = String.valueOf(new java.util.Random().nextInt(9000) + 1000);
                 String uid = "USER_" + java.util.UUID.randomUUID().toString().substring(0, 8);
@@ -168,67 +145,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void shareInviteLink() {
         String myId = getSharedPreferences("titak_prefs", MODE_PRIVATE).getString("local_titak_id", "");
-        String inviteMsg = "TiTak'ta benimle konuşmaya başla! ID'm: " + myId + "\nUygulamayı indir ve bu linke tıkla: https://titak.efe.com/invite?id=" + myId;
-        
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteMsg);
+        String inviteMsg = "TiTak Telsiz Ağına Katıl! ID'm: " + myId + "\nİndir: https://titak.efe.com/invite?id=" + myId;
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
         sendIntent.setType("text/plain");
-        sendIntent.setPackage("com.whatsapp");
-        
-        try {
-            startActivity(sendIntent);
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "WhatsApp yüklü değil.", Toast.LENGTH_SHORT).show();
-            sendIntent.setPackage(null);
-            startActivity(Intent.createChooser(sendIntent, "Arkadaşını Davet Et"));
-        }
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        handleIncomingIntent(intent);
-    }
-
-    private void handleIncomingIntent(Intent intent) {
-        Uri data = intent.getData();
-        if (data != null && data.getPath() != null && data.getPath().equals("/invite")) {
-            String inviterId = data.getQueryParameter("id");
-            if (inviterId != null && !inviterId.isEmpty()) {
-                SocialManager.getInstance().sendFriendRequest(inviterId, new SocialManager.SocialCallback() {
-                    @Override
-                    public void onSuccess(String message) {
-                        Toast.makeText(MainActivity.this, "Arkadaş otomatik olarak eklendi!", Toast.LENGTH_LONG).show();
-                    }
-                    @Override
-                    public void onError(String error) {
-                        Toast.makeText(MainActivity.this, "Arkadaş eklenirken hata: " + error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        }
+        sendIntent.putExtra(Intent.EXTRA_TEXT, inviteMsg);
+        startActivity(Intent.createChooser(sendIntent, "Arkadaşını Davet Et"));
     }
 
     private void showProPasswordDialog() {
         EditText etPassword = new EditText(this);
-        etPassword.setHint("Şifre yazınız");
+        etPassword.setHint("Şifre");
         etPassword.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
         new AlertDialog.Builder(this)
-            .setTitle("PRO ERİŞİMİ")
-            .setMessage("Lütfen Pro özellikleri açmak için şifreyi girin.")
+            .setTitle("PRO ERİŞİM")
             .setView(etPassword)
-            .setPositiveButton("Giriş", (d, w) -> {
-                String pass = etPassword.getText().toString();
-                if ("ALİ".equals(pass)) {
-                    Toast.makeText(this, "PRO Özellikler Aktif!", Toast.LENGTH_SHORT).show();
+            .setPositiveButton("GİRİŞ", (d, w) -> {
+                if ("ALİ".equals(etPassword.getText().toString())) {
                     startActivity(new Intent(this, ProSettingsActivity.class));
                 } else {
-                    Toast.makeText(this, "Yanlış Şifre!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Şifre Yanlış", Toast.LENGTH_SHORT).show();
                 }
-            })
-            .setNegativeButton("Iptal", null)
-            .show();
+            }).show();
     }
 }
